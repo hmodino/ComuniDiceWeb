@@ -22,4 +22,5 @@ public interface ParameterNames {
 	public static final String USER_NAME = "nombreUsuario";
 	public static final String SEARCH_BOX = "searchBox";
 	public static final String SEARCH_BY = "searchBy";
+	public static final String ID = "id";
 }

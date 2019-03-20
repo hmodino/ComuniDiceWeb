@@ -17,12 +17,14 @@ import com.comunidice.web.util.AttributeNames;
 import com.comunidice.web.util.ErrorCodes;
 import com.comunidice.web.util.ParameterNames;
 import com.comunidice.web.util.ParamsUtils;
+import com.comunidice.web.util.RedirectOrForward;
 import com.comunidice.web.util.SessionAttributeNames;
 import com.comunidice.web.util.SessionManager;
 import com.comunidice.web.util.ValidationUtils;
 import com.comunidice.web.util.ViewPaths;
-import com.mysql.cj.util.StringUtils;
 import com.rollanddice.comunidice.model.Direccion;
+import com.rollanddice.comunidice.model.Pais;
+import com.rollanddice.comunidice.model.Region;
 import com.rollanddice.comunidice.model.Usuario;
 import com.rollanddice.comunidice.service.impl.UsuarioServiceImpl;
 import com.rollanddice.comunidice.service.spi.UsuarioService;
@@ -31,20 +33,30 @@ import com.rollanddice.comunidice.service.spi.UsuarioService;
 public class UsuarioServlet extends HttpServlet {
 
 	private static Logger logger = LogManager.getLogger(UsuarioServlet.class);
+	
 	private UsuarioService service = null;
 	
+	
+	private Errors errors = null;
+	private Usuario u = null;
+	private Direccion d = null;;
+	private Region r = null;
+	private Pais p = null;
     public UsuarioServlet() {
     	super();
     	service = new UsuarioServiceImpl();
+    	errors = new Errors();
+    	u = new Usuario();
+    	d = new Direccion();
+    	r = new Region();
+    	p = new Pais();
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
 
-		String action = ParamsUtils.getParameter(request, ParameterNames.ACTION);
-		Errors errors = new Errors();
-		Usuario u = new Usuario();
-		Direccion d = new Direccion();
+		String action = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.ACTION));
+		
 		String target = null;
 		String email = null;
 		String password = null;
@@ -64,25 +76,27 @@ public class UsuarioServlet extends HttpServlet {
 		Integer floor = null;
 		String other = null;
 
+		Boolean redirect = null;
 		
 		if (Actions.LOGIN.equalsIgnoreCase(action)) {
 			
-			email = ParamsUtils.getParameter(request, ParameterNames.EMAIL);
-			password = ParamsUtils.getParameter(request, ParameterNames.PASSWORD);
+			email = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.EMAIL));
+			password = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PASSWORD));
 
-			if (StringUtils.isEmptyOrWhitespaceOnly(email)) {
+			if (email == null) {
 				errors.add(ParameterNames.EMAIL,ErrorCodes.MANDATORY_PARAMETER);
 			}
-			if(StringUtils.isEmptyOrWhitespaceOnly(password)) {
+			if(password == null) {
 				errors.add(ParameterNames.PASSWORD, ErrorCodes.MANDATORY_PARAMETER);
 			}
-
+			if(!errors.hasErrors()) {
 				try {
 					u = service.logIn(email, password);
 				} catch (Exception ex) {
+					errors.add(ParameterNames.USER, ErrorCodes.LOGIN_ERROR);
 					ex.printStackTrace();
 				}
-			
+			}
 			if (errors.hasErrors() || u==null) {	
 				if (logger.isDebugEnabled()) {
 					logger.debug("Autenticacion fallida: {}", errors);
@@ -92,9 +106,9 @@ public class UsuarioServlet extends HttpServlet {
 				request.setAttribute(AttributeNames.ERRORS, errors);				
 				target = ViewPaths.LOGIN;
 			} else {
-				
 				SessionManager.set(request, SessionAttributeNames.USER, u);		
-				target = ViewPaths.HOME;	
+				target = ViewPaths.HOME;
+				redirect = true;
 			}
 		}
 		
@@ -102,6 +116,7 @@ public class UsuarioServlet extends HttpServlet {
 			
 			SessionManager.set(request, SessionAttributeNames.USER, null);
 			target = ViewPaths.HOME;
+			redirect = true;
 		}
 		
 		else if(Actions.SEARCH_USERS.equalsIgnoreCase(action)) {
@@ -109,13 +124,13 @@ public class UsuarioServlet extends HttpServlet {
 			searchBy = ParamsUtils.getParameter(request, ParameterNames.SEARCH_BY);
 			
 			if(searchBy.equalsIgnoreCase(ParameterNames.EMAIL)) {
-				email = ParamsUtils.getParameter(request, ParameterNames.SEARCH_BOX);
-				if(StringUtils.isEmptyOrWhitespaceOnly(email)) {
+				email = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SEARCH_BOX));
+				if(email == null) {
 					errors.add(ParameterNames.EMAIL,ErrorCodes.MANDATORY_PARAMETER);
 				}
 			}else if(searchBy.equalsIgnoreCase(ParameterNames.USER_NAME)){
-				userName = ParamsUtils.getParameter(request, ParameterNames.USER_NAME);
-				if(StringUtils.isEmptyOrWhitespaceOnly(userName)) {
+				userName = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.USER_NAME));
+				if(userName == null) {
 					errors.add(ParameterNames.EMAIL,ErrorCodes.MANDATORY_PARAMETER);
 				}
 			}
@@ -136,70 +151,236 @@ public class UsuarioServlet extends HttpServlet {
 				if (logger.isDebugEnabled()) {
 					logger.debug("El usuario que buscas no existe: {}", errors);
 				}
-				errors.add(ParameterNames.ACTION,ErrorCodes.NOT_FOUND_OBJECT);				
-				request.setAttribute(AttributeNames.ERRORS, errors);
+				errors.add(ParameterNames.ACTION,ErrorCodes.NOT_FOUND_OBJECT);
 				target = ViewPaths.BUSCADOR;
+				redirect = false;
+				request.setAttribute(AttributeNames.ERRORS, errors);
 			}else {
 				target = ViewPaths.BUSCADOR;
-				request.setAttribute(AttributeNames.RESULTADOS, u);
+				redirect = false;
+				request.setAttribute(AttributeNames.RESULTS, u);
 			}
 		}
 		
 		else if(Actions.SIGN_UP.equalsIgnoreCase(action)) {
 			
-			name = ParamsUtils.getParameter(request, ParameterNames.NAME);
-			password = ParamsUtils.getParameter(request, ParameterNames.PASSWORD);
-			email = ParamsUtils.getParameter(request, ParameterNames.EMAIL);
-			userName = ParamsUtils.getParameter(request, ParameterNames.USER_NAME);
-			surname1 = ParamsUtils.getParameter(request, ParameterNames.SURNAME);
-			surname2 = ParamsUtils.getParameter(request, ParameterNames.SURNAME2);
-			description = ParamsUtils.getParameter(request, ParameterNames.DESCRIPTION);
-			phone = ParamsUtils.getParameter(request, ParameterNames.PHONE);
-			municipality = ParamsUtils.getParameter(request, ParameterNames.MUNICIPALITY);
-			locality = ParamsUtils.getParameter(request, ParameterNames.LOCALITY);
-			cp = ParamsUtils.getParameter(request, ParameterNames.CP);
-			street = ParamsUtils.getParameter(request, ParameterNames.STREET);
+			name = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.NAME));
+			password = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PASSWORD));
+			email = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.EMAIL));
+			userName = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.USER_NAME));
+			surname1 = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SURNAME));
+			surname2 = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SURNAME2));
+			description = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.DESCRIPTION));
+			phone = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PHONE));
+			municipality = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.MUNICIPALITY));
+			locality = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.LOCALITY));
+			cp = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.CP));
+			street = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.STREET));
 			number = ValidationUtils.parseInt(ParamsUtils.getParameter(request, ParameterNames.PORTAL_NUMBER));
-			portal = ParamsUtils.getParameter(request, ParameterNames.PORTAL);
+			portal = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PORTAL));
 			floor = ValidationUtils.parseInt(ParamsUtils.getParameter(request, ParameterNames.FLOOR));
-			other = ParamsUtils.getParameter(request, ParameterNames.DIRECTION_OTHERS);
+			other = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.DIRECTION_OTHERS));
 			
-			if(!StringUtils.isEmptyOrWhitespaceOnly(name)) {
+			if(name != null) {
 				u.setNombre(name);
 			}else {
 				errors.add(ParameterNames.NAME, ErrorCodes.MANDATORY_PARAMETER);
 			}
-			if(!StringUtils.isEmptyOrWhitespaceOnly(password)) {
+			if(password != null) {
 				u.setContrasenha(password);
 			}else {
 				errors.add(ParameterNames.PASSWORD, ErrorCodes.MANDATORY_PARAMETER);
 			}
-			if(!StringUtils.isEmptyOrWhitespaceOnly(email)) {
+			if(email != null) {
 				u.setEmail(email);
 			}else {
 				errors.add(ParameterNames.EMAIL, ErrorCodes.MANDATORY_PARAMETER);
 			}
-			if(!StringUtils.isEmptyOrWhitespaceOnly(userName)) {
+			if(userName != null) {
 				u.setNombreUsuario(userName);
 			}else {
 				errors.add(ParameterNames.USER_NAME, ErrorCodes.MANDATORY_PARAMETER);
 			}
-			if(!StringUtils.isEmptyOrWhitespaceOnly(surname1)) {
+			if(surname1 != null) {
 				u.setApellido1(surname1);
 			}else {
 				errors.add(ParameterNames.SURNAME, ErrorCodes.MANDATORY_PARAMETER);
 			}
-			if(!StringUtils.isEmptyOrWhitespaceOnly(surname2)) {
+			if(surname2 != null) {
 				u.setApellido2(surname2);
 			}
-			if(!StringUtils.isEmptyOrWhitespaceOnly(description)) {
+			if(description != null) {
 				u.setDescripcion(description);
 			}
-			if(!StringUtils.isEmptyOrWhitespaceOnly(phone)) {
+			if(phone != null) {
 				u.setTelefono(phone);
 			}
+			if(municipality != null && cp != null) {
+				d.setMunicipio(municipality);
+				d.setCp(cp);
+				if(other != null) {
+					d.setOtros(other);
+				}
+				if(locality != null) {
+					d.setLocalidad(locality);
+				}
+				if(street != null) {
+					d.setCalle(street);
+					if(number == null) {
+						errors.add(ParameterNames.PORTAL_NUMBER, ErrorCodes.MANDATORY_PARAMETER);
+					}
+				}
+				if(number != null) {
+					d.setNumero(number);
+				}
+				if(portal != null) {
+					d.setPortal(portal);
+				}
+				if(floor != null) {
+					d.setPiso(floor);
+				}
+				if(street == null && other == null) {
+					errors.add(ParameterNames.STREET, ErrorCodes.ALTERNATIVE_MANDATORY_PARAMETERS);
+					errors.add(ParameterNames.DIRECTION_OTHERS, ErrorCodes.ALTERNATIVE_MANDATORY_PARAMETERS);
+				}
+			}
+
+			if(u == null || errors.hasErrors()) {
+				
+				if (logger.isDebugEnabled()) {
+					logger.debug("El usuario que buscas no existe: {}", errors);
+				}				
+				target = ViewPaths.SIGNUP;
+				redirect = false;
+				request.setAttribute(AttributeNames.ERRORS, errors);
+			}else {
+				try {
+					service.signUp(u, d);
+					SessionManager.set(request, SessionAttributeNames.USER, u);	
+					target = ViewPaths.HOME;
+					redirect = true;
+				} catch (Exception e) {
+					errors.add(ParameterNames.USER, ErrorCodes.SIGN_UP_ERROR);
+					target = ViewPaths.SIGNUP;
+					redirect = false;
+					request.setAttribute(AttributeNames.ERRORS, errors);
+				}
+			}
 		}
-		request.getRequestDispatcher(target).forward(request, response);
+		
+		else if(Actions.EDIT.equalsIgnoreCase(action)) {
+			
+			name = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.NAME));
+			password = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PASSWORD));
+			email = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.EMAIL));
+			userName = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.USER_NAME));
+			surname1 = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SURNAME));
+			surname2 = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SURNAME2));
+			description = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.DESCRIPTION));
+			phone = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PHONE));
+			municipality = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.MUNICIPALITY));
+			locality = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.LOCALITY));
+			cp = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.CP));
+			street = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.STREET));
+			number = ValidationUtils.parseInt(ParamsUtils.getParameter(request, ParameterNames.PORTAL_NUMBER));
+			portal = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PORTAL));
+			floor = ValidationUtils.parseInt(ParamsUtils.getParameter(request, ParameterNames.FLOOR));
+			other = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.DIRECTION_OTHERS));
+			
+			if(name != null) {
+				u.setNombre(name);
+			}
+			if(password != null) {
+				u.setContrasenha(password);
+			}
+			if(email != null) {
+				u.setEmail(email);
+			}
+			if(userName != null) {
+				u.setNombreUsuario(userName);
+			}
+			if(surname1 != null) {
+				u.setApellido1(surname1);
+			}
+			if(surname2 != null) {
+				u.setApellido2(surname2);
+			}
+			if(description != null) {
+				u.setDescripcion(description);
+			}
+			if(phone != null) {
+				u.setTelefono(phone);
+			}
+			if(municipality != null && cp != null) {
+				d.setMunicipio(municipality);
+				d.setCp(cp);
+				if(other != null) {
+					d.setOtros(other);
+				}
+				if(locality != null) {
+					d.setLocalidad(locality);
+				}
+				if(street != null) {
+					d.setCalle(street);
+					if(number == null) {
+						errors.add(ParameterNames.PORTAL_NUMBER, ErrorCodes.MANDATORY_PARAMETER);
+					}
+				}
+				if(number != null) {
+					d.setNumero(number);
+				}
+				if(portal != null) {
+					d.setPortal(portal);
+				}
+				if(floor != null) {
+					d.setPiso(floor);
+				}
+				if(street == null && other == null) {
+					errors.add(ParameterNames.STREET, ErrorCodes.ALTERNATIVE_MANDATORY_PARAMETERS);
+					errors.add(ParameterNames.DIRECTION_OTHERS, ErrorCodes.ALTERNATIVE_MANDATORY_PARAMETERS);
+				}
+			}
+
+			if(errors.hasErrors()) {
+				
+				if (logger.isDebugEnabled()) {
+					logger.debug("El usuario que buscas no existe: {}", errors);
+				}				
+				target = ViewPaths.SIGNUP;
+				redirect = false;
+				request.setAttribute(AttributeNames.ERRORS, errors);
+			}else {
+				try {
+					service.editar(u, d);	
+					target = ViewPaths.USER_PROFILE;
+					redirect = true;
+				} catch (Exception e) {
+					errors.add(ParameterNames.USER, ErrorCodes.UPDATE_ERROR);
+					target = ViewPaths.USER_PROFILE;
+					redirect = false;
+					request.setAttribute(AttributeNames.ERRORS, errors);
+				}
+			}
+		}
+		
+		else if(Actions.DETAIL_VIEW.equalsIgnoreCase(action)) {
+			
+			try {
+			u = service.findById(ValidationUtils.parseInt(ParamsUtils.getParameter(request, ParameterNames.ID)));
+			target = ViewPaths.PROFILE;
+			redirect = false;
+			if(u==null) {
+				errors.add(ParameterNames.USER, ErrorCodes.PROFILE_VIEW_ERROR);
+			}
+			request.setAttribute(AttributeNames.USER, u);
+			}
+			catch(Exception e){
+				target = ViewPaths.HOME;
+				redirect = false;
+				request.setAttribute(AttributeNames.ERRORS, errors);
+			}
+		}
+		RedirectOrForward.send(request, response, redirect, target);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
