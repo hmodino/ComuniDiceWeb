@@ -8,4 +8,7 @@ public class Actions {
 	public static final String EDIT = "edit";
 	public static final String DELETE = "delete";
 	public static final String DETAIL_VIEW = "detailView";
+	public static final String PROFILE_VIEW = "profileView";
+	public static final String FIND_FRIENDS = "findFriends";
+	public static final String MESSAGES = "messages";
 }

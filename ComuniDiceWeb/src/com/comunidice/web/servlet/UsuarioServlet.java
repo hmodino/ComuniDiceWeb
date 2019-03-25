@@ -1,6 +1,8 @@
 package com.comunidice.web.servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,11 +24,14 @@ import com.comunidice.web.util.SessionAttributeNames;
 import com.comunidice.web.util.SessionManager;
 import com.comunidice.web.util.ValidationUtils;
 import com.comunidice.web.util.ViewPaths;
+import com.rollanddice.comunidice.model.Amigo;
 import com.rollanddice.comunidice.model.Direccion;
 import com.rollanddice.comunidice.model.Pais;
 import com.rollanddice.comunidice.model.Region;
 import com.rollanddice.comunidice.model.Usuario;
+import com.rollanddice.comunidice.service.impl.AmigoServiceImpl;
 import com.rollanddice.comunidice.service.impl.UsuarioServiceImpl;
+import com.rollanddice.comunidice.service.spi.AmigoService;
 import com.rollanddice.comunidice.service.spi.UsuarioService;
 
 @WebServlet("/usuario")
@@ -35,25 +40,27 @@ public class UsuarioServlet extends HttpServlet {
 	private static Logger logger = LogManager.getLogger(UsuarioServlet.class);
 	
 	private UsuarioService service = null;
+	private AmigoService amigoService = null;
 	
 	
-	private Errors errors = null;
-	private Usuario u = null;
-	private Direccion d = null;;
-	private Region r = null;
-	private Pais p = null;
+	
+	
     public UsuarioServlet() {
     	super();
     	service = new UsuarioServiceImpl();
-    	errors = new Errors();
-    	u = new Usuario();
-    	d = new Direccion();
-    	r = new Region();
-    	p = new Pais();
+    	amigoService = new AmigoServiceImpl();
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
+		
+		Errors errors = new Errors();
+		Usuario u = null;
+		Direccion d = null;;
+		Region r = null;
+		Pais p = null;
+		Amigo a = null;
+		List<Amigo> amigos = null;
 
 		String action = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.ACTION));
 		
@@ -129,7 +136,7 @@ public class UsuarioServlet extends HttpServlet {
 					errors.add(ParameterNames.EMAIL,ErrorCodes.MANDATORY_PARAMETER);
 				}
 			}else if(searchBy.equalsIgnoreCase(ParameterNames.USER_NAME)){
-				userName = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.USER_NAME));
+				userName = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SEARCH_BOX));
 				if(userName == null) {
 					errors.add(ParameterNames.EMAIL,ErrorCodes.MANDATORY_PARAMETER);
 				}
@@ -163,6 +170,8 @@ public class UsuarioServlet extends HttpServlet {
 		}
 		
 		else if(Actions.SIGN_UP.equalsIgnoreCase(action)) {
+			
+			u = new Usuario();
 			
 			name = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.NAME));
 			password = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PASSWORD));
@@ -215,7 +224,10 @@ public class UsuarioServlet extends HttpServlet {
 			if(phone != null) {
 				u.setTelefono(phone);
 			}
+			logger.debug(municipality);
 			if(municipality != null && cp != null) {
+				d= new Direccion();
+				d.setRegion(27);
 				d.setMunicipio(municipality);
 				d.setCp(cp);
 				if(other != null) {
@@ -269,6 +281,9 @@ public class UsuarioServlet extends HttpServlet {
 		}
 		
 		else if(Actions.EDIT.equalsIgnoreCase(action)) {
+
+			u = new Usuario();
+			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
 			name = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.NAME));
 			password = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PASSWORD));
@@ -286,7 +301,7 @@ public class UsuarioServlet extends HttpServlet {
 			portal = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PORTAL));
 			floor = ValidationUtils.parseInt(ParamsUtils.getParameter(request, ParameterNames.FLOOR));
 			other = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.DIRECTION_OTHERS));
-			
+			logger.debug(u);
 			if(name != null) {
 				u.setNombre(name);
 			}
@@ -312,6 +327,7 @@ public class UsuarioServlet extends HttpServlet {
 				u.setTelefono(phone);
 			}
 			if(municipality != null && cp != null) {
+				d = new Direccion();
 				d.setMunicipio(municipality);
 				d.setCp(cp);
 				if(other != null) {
@@ -346,17 +362,18 @@ public class UsuarioServlet extends HttpServlet {
 				if (logger.isDebugEnabled()) {
 					logger.debug("El usuario que buscas no existe: {}", errors);
 				}				
-				target = ViewPaths.SIGNUP;
+				target = ViewPaths.PROFILE;
 				redirect = false;
 				request.setAttribute(AttributeNames.ERRORS, errors);
 			}else {
 				try {
 					service.editar(u, d);	
-					target = ViewPaths.USER_PROFILE;
-					redirect = true;
+					request.setAttribute(AttributeNames.USER, u);
+					target = ViewPaths.PROFILE;
+					redirect = false;
 				} catch (Exception e) {
 					errors.add(ParameterNames.USER, ErrorCodes.UPDATE_ERROR);
-					target = ViewPaths.USER_PROFILE;
+					target = ViewPaths.PROFILE;
 					redirect = false;
 					request.setAttribute(AttributeNames.ERRORS, errors);
 				}
@@ -366,18 +383,51 @@ public class UsuarioServlet extends HttpServlet {
 		else if(Actions.DETAIL_VIEW.equalsIgnoreCase(action)) {
 			
 			try {
-			u = service.findById(ValidationUtils.parseInt(ParamsUtils.getParameter(request, ParameterNames.ID)));
-			target = ViewPaths.PROFILE;
-			redirect = false;
-			if(u==null) {
-				errors.add(ParameterNames.USER, ErrorCodes.PROFILE_VIEW_ERROR);
-			}
-			request.setAttribute(AttributeNames.USER, u);
+				u = service.findById(ValidationUtils.parseInt(ParamsUtils.getParameter(request, ParameterNames.ID)));
+				target = ViewPaths.PROFILE;
+				redirect = false;
+				if(u==null) {
+					errors.add(ParameterNames.USER, ErrorCodes.PROFILE_VIEW_ERROR);
+				}
+				request.setAttribute(AttributeNames.USER, u);
 			}
 			catch(Exception e){
 				target = ViewPaths.HOME;
 				redirect = false;
 				request.setAttribute(AttributeNames.ERRORS, errors);
+			}
+		}else if(Actions.PROFILE_VIEW.equalsIgnoreCase(action)) {
+			
+			try {
+				u = new Usuario();
+				u = (Usuario) SessionManager.get(request, AttributeNames.USER);
+				target = ViewPaths.PROFILE;
+				logger.debug(u);
+				redirect = false;
+				if(u==null) {
+					errors.add(ParameterNames.USER, ErrorCodes.PROFILE_VIEW_ERROR);
+				}
+				request.setAttribute(AttributeNames.USER, u);
+			}
+			catch(Exception e){
+				target = ViewPaths.HOME;
+				redirect = false;
+				request.setAttribute(AttributeNames.ERRORS, errors);
+			}
+		} else if(Actions.FIND_FRIENDS.equalsIgnoreCase(action)) {
+			
+			u = new Usuario();
+			u = (Usuario)SessionManager.get(request, AttributeNames.USER);
+			if(u != null) {
+				amigos = new ArrayList();
+				try{
+					amigos = amigoService.findAmigos(u.getIdUsuario());
+					request.setAttribute(AttributeNames.RESULTS, amigos);
+					target = ViewPaths.FRIENDS_FINDER;
+					redirect = false;
+				}catch(Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 		}
 		RedirectOrForward.send(request, response, redirect, target);
