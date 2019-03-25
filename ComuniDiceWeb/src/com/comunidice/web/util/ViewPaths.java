@@ -10,5 +10,6 @@ public class ViewPaths {
 	public static final String PROFILE = "/html/perfil-page.jsp";
 	public static final String EDIT_PROFILE = "/html/edicion-perfil-page.jsp";
 	public static final String FRIENDS_FINDER = "/html/buscador-amigos-page.jsp";
+	public static final String MESSAGES = "/html/messages-page.jsp";
 	
 }

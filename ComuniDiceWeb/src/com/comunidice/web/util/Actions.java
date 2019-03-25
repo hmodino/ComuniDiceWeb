@@ -10,5 +10,6 @@ public class Actions {
 	public static final String DETAIL_VIEW = "detailView";
 	public static final String PROFILE_VIEW = "profileView";
 	public static final String FIND_FRIENDS = "findFriends";
-	public static final String MESSAGES = "messages";
+	public static final String FIND_MESSAGES = "findMessages";
+	public static final String SEND_MESSAGE = "sendMessage";
 }

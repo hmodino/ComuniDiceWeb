@@ -23,4 +23,10 @@ public interface ParameterNames {
 	public static final String SEARCH_BOX = "searchBox";
 	public static final String SEARCH_BY = "searchBy";
 	public static final String ID = "id";
+	public static final String FRIEND = "friend";
+	public static final String MESSAGE = "message";
+	public static final String MESSAGE_CONTENT = "messageContent";
+	public static final String MESSAGE_TYPE = "messageType";
+	public static final String SENDER = "sender";
+	public static final String RECEIVER = "receiver";
 }

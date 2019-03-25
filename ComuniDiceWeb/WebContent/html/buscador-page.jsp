@@ -10,9 +10,10 @@
 		Usuario user = (Usuario) request.getAttribute(AttributeNames.RESULTS);
 		if (user!=null) {
 	%>
-	<ul>
-		<li><%=user%></li>
-	</ul><%
+		<a href="/ComuniDiceWeb/usuario?action=<%=Actions.DETAIL_VIEW%>&amp;<%=ParameterNames.ID%>=<%=user.getIdUsuario()%>">
+			<%=user.getNombreUsuario()%></a>
+			<p><%=user.getDescripcion() %></p>
+	<%
 			}
 		else{
 		%><p>No existen coincidencias</p><%

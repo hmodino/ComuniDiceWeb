@@ -9,5 +9,7 @@ public interface ErrorCodes {
 	public static final String ALTERNATIVE_MANDATORY_PARAMETERS = "alternativeMandatoryParameters";
 	public static final String LOGIN_ERROR = "loginError";
 	public static final String UPDATE_ERROR = "updateError";
-	public static final String PROFILE_VIEW_ERROR = "profileViewError";
+	public static final String URL_ERROR = "URLError";
+	public static final String FINDER_ERROR = "findError";
+	public static final String SEND_MESSAGE_ERROR = "sendMessageError";
 }
