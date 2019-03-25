@@ -7,11 +7,12 @@
 		}
 	%>
 	<%	
-		Amigo amigo = (Amigo) request.getAttribute(AttributeNames.RESULTS);
+		List<Amigo> amigo = (List<Amigo>) request.getAttribute(AttributeNames.RESULTS);
 		if (amigo!=null) {
 	%>
-	<ul>
+	<ul><%for(Amigo a:amigo){ %>
 		<li><%=amigo%></li>
+		<%} %>
 	</ul><%
 			}
 		else{
