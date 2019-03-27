@@ -10,6 +10,8 @@ public class Actions {
 	public static final String DETAIL_VIEW = "detailView";
 	public static final String PROFILE_VIEW = "profileView";
 	public static final String FIND_FRIENDS = "findFriends";
+	public static final String ADD_FRIEND = "addFriend";
+	public static final String FIND_FRIENDS_BY = "findFriendsBy";
 	public static final String FIND_MESSAGES = "findMessages";
 	public static final String SEND_MESSAGE = "sendMessage";
 }

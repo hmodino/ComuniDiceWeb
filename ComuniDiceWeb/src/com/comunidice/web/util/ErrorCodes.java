@@ -12,4 +12,5 @@ public interface ErrorCodes {
 	public static final String URL_ERROR = "URLError";
 	public static final String FINDER_ERROR = "findError";
 	public static final String SEND_MESSAGE_ERROR = "sendMessageError";
+	public static final String ADD_ERROR = "addError";
 }
