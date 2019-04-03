@@ -18,7 +18,6 @@ import com.comunidice.web.util.Actions;
 import com.comunidice.web.util.AttributeNames;
 import com.comunidice.web.util.ErrorCodes;
 import com.comunidice.web.util.ParameterNames;
-import com.comunidice.web.util.ParamsUtils;
 import com.comunidice.web.util.RedirectOrForward;
 import com.comunidice.web.util.SessionAttributeNames;
 import com.comunidice.web.util.SessionManager;
@@ -65,14 +64,12 @@ public class UsuarioServlet extends HttpServlet {
 		Direccion d = null;;
 		Region r = null;
 		Pais p = null;
-		Amigo a = null;
 		Mensaje m = null;
 		
 		List<Mensaje> messages = null;
-		List<Amigo> friends = null;
-		
+		List<Usuario> friends = null;
 
-		String action = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.ACTION));
+		String action = ValidationUtils.parameterIsEmpty(request, ParameterNames.ACTION);
 		
 		String target = null;
 		String email = null;
@@ -100,8 +97,8 @@ public class UsuarioServlet extends HttpServlet {
 		
 		if (Actions.LOGIN.equalsIgnoreCase(action)) {
 			
-			email = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.EMAIL));
-			password = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PASSWORD));
+			email = ValidationUtils.parameterIsEmpty(request, ParameterNames.EMAIL);
+			password = ValidationUtils.parameterIsEmpty(request, ParameterNames.PASSWORD);
 
 			if (email == null) {
 				errors.add(ParameterNames.EMAIL,ErrorCodes.MANDATORY_PARAMETER);
@@ -141,15 +138,15 @@ public class UsuarioServlet extends HttpServlet {
 		
 		else if(Actions.SEARCH_USERS.equalsIgnoreCase(action)) {
 			
-			searchBy = ParamsUtils.getParameter(request, ParameterNames.SEARCH_BY);
+			searchBy = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_BY);
 			
 			if(searchBy.equalsIgnoreCase(ParameterNames.EMAIL)) {
-				email = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SEARCH_BOX));
+				email = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_BOX);
 				if(email == null) {
 					errors.add(ParameterNames.EMAIL,ErrorCodes.MANDATORY_PARAMETER);
 				}
 			}else if(searchBy.equalsIgnoreCase(ParameterNames.USER_NAME)){
-				userName = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SEARCH_BOX));
+				userName = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_BOX);
 				if(userName == null) {
 					errors.add(ParameterNames.EMAIL,ErrorCodes.MANDATORY_PARAMETER);
 				}
@@ -187,22 +184,22 @@ public class UsuarioServlet extends HttpServlet {
 			
 			u = new Usuario();
 			
-			name = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.NAME));
-			password = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PASSWORD));
-			email = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.EMAIL));
-			userName = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.USER_NAME));
-			surname1 = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SURNAME));
-			surname2 = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SURNAME2));
-			description = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.DESCRIPTION));
-			phone = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PHONE));
-			municipality = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.MUNICIPALITY));
-			locality = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.LOCALITY));
-			cp = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.CP));
-			street = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.STREET));
-			number = ValidationUtils.parseInt(ParamsUtils.getParameter(request, ParameterNames.PORTAL_NUMBER));
-			portal = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PORTAL));
-			floor = ValidationUtils.parseInt(ParamsUtils.getParameter(request, ParameterNames.FLOOR));
-			other = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.DIRECTION_OTHERS));
+			name = ValidationUtils.parameterIsEmpty(request, ParameterNames.NAME);
+			password = ValidationUtils.parameterIsEmpty(request, ParameterNames.PASSWORD);
+			email = ValidationUtils.parameterIsEmpty(request, ParameterNames.EMAIL);
+			userName = ValidationUtils.parameterIsEmpty(request, ParameterNames.USER_NAME);
+			surname1 = ValidationUtils.parameterIsEmpty(request, ParameterNames.SURNAME);
+			surname2 = ValidationUtils.parameterIsEmpty(request, ParameterNames.SURNAME2);
+			description = ValidationUtils.parameterIsEmpty(request, ParameterNames.DESCRIPTION);
+			phone = ValidationUtils.parameterIsEmpty(request, ParameterNames.PHONE);
+			municipality = ValidationUtils.parameterIsEmpty(request, ParameterNames.MUNICIPALITY);
+			locality = ValidationUtils.parameterIsEmpty(request, ParameterNames.LOCALITY);
+			cp = ValidationUtils.parameterIsEmpty(request, ParameterNames.CP);
+			street = ValidationUtils.parameterIsEmpty(request, ParameterNames.STREET);
+			number = ValidationUtils.parseIntParameter(request, ParameterNames.PORTAL_NUMBER);
+			portal = ValidationUtils.parameterIsEmpty(request, ParameterNames.PORTAL);
+			floor = ValidationUtils.parseIntParameter(request, ParameterNames.FLOOR);
+			other = ValidationUtils.parameterIsEmpty(request, ParameterNames.DIRECTION_OTHERS);
 			
 			if(name != null) {
 				u.setNombre(name);
@@ -299,22 +296,22 @@ public class UsuarioServlet extends HttpServlet {
 			u = new Usuario();
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
-			name = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.NAME));
-			password = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PASSWORD));
-			email = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.EMAIL));
-			userName = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.USER_NAME));
-			surname1 = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SURNAME));
-			surname2 = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SURNAME2));
-			description = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.DESCRIPTION));
-			phone = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PHONE));
-			municipality = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.MUNICIPALITY));
-			locality = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.LOCALITY));
-			cp = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.CP));
-			street = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.STREET));
-			number = ValidationUtils.parseInt(ParamsUtils.getParameter(request, ParameterNames.PORTAL_NUMBER));
-			portal = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.PORTAL));
-			floor = ValidationUtils.parseInt(ParamsUtils.getParameter(request, ParameterNames.FLOOR));
-			other = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.DIRECTION_OTHERS));
+			name = ValidationUtils.parameterIsEmpty(request, ParameterNames.NAME);
+			password = ValidationUtils.parameterIsEmpty(request, ParameterNames.PASSWORD);
+			email = ValidationUtils.parameterIsEmpty(request, ParameterNames.EMAIL);
+			userName = ValidationUtils.parameterIsEmpty(request, ParameterNames.USER_NAME);
+			surname1 = ValidationUtils.parameterIsEmpty(request, ParameterNames.SURNAME);
+			surname2 = ValidationUtils.parameterIsEmpty(request, ParameterNames.SURNAME2);
+			description = ValidationUtils.parameterIsEmpty(request, ParameterNames.DESCRIPTION);
+			phone = ValidationUtils.parameterIsEmpty(request, ParameterNames.PHONE);
+			municipality = ValidationUtils.parameterIsEmpty(request, ParameterNames.MUNICIPALITY);
+			locality = ValidationUtils.parameterIsEmpty(request, ParameterNames.LOCALITY);
+			cp = ValidationUtils.parameterIsEmpty(request, ParameterNames.CP);
+			street = ValidationUtils.parameterIsEmpty(request, ParameterNames.STREET);
+			number = ValidationUtils.parseIntParameter(request, ParameterNames.PORTAL_NUMBER);
+			portal = ValidationUtils.parameterIsEmpty(request, ParameterNames.PORTAL);
+			floor = ValidationUtils.parseIntParameter(request, ParameterNames.FLOOR);
+			other = ValidationUtils.parameterIsEmpty(request, ParameterNames.DIRECTION_OTHERS);
 
 			if(name != null) {
 				u.setNombre(name);
@@ -397,7 +394,7 @@ public class UsuarioServlet extends HttpServlet {
 		else if(Actions.DETAIL_VIEW.equalsIgnoreCase(action)) {
 			
 			u = new Usuario();
-			id = ValidationUtils.parseInt(ParamsUtils.getParameter(request, ParameterNames.ID));
+			id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 			
 			if(id != null) {
 				try {
@@ -450,7 +447,7 @@ public class UsuarioServlet extends HttpServlet {
 			u = (Usuario)SessionManager.get(request, AttributeNames.USER);
 			
 			if(u != null) {
-				friends = new ArrayList<Amigo>();
+				friends = new ArrayList<Usuario>();
 				try{
 					friends = amigoService.findAmigos(u.getIdUsuario());
 				}catch(Exception ex) {
@@ -477,24 +474,24 @@ public class UsuarioServlet extends HttpServlet {
 		}
 		
 		else if(Actions.FIND_FRIENDS_BY.equalsIgnoreCase(action)) {
-			
-			a = new Amigo();
+
 			u = new Usuario();
+			friends = new ArrayList<Usuario>();
 			
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			searchBy = ParamsUtils.getParameter(request, ParameterNames.SEARCH_BY);
+			searchBy = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_BY);
 			
 			if(u == null) {
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
 				target = ViewPaths.HOME;
 			}else {
 				if(searchBy.equalsIgnoreCase(ParameterNames.EMAIL)) {
-					email = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SEARCH_BOX));
+					email = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_BOX);
 					if(email == null) {
 						errors.add(ParameterNames.EMAIL,ErrorCodes.MANDATORY_PARAMETER);
 					}
 				}else if(searchBy.equalsIgnoreCase(ParameterNames.USER_NAME)){
-					userName = ValidationUtils.isEmpty(ParamsUtils.getParameter(request, ParameterNames.SEARCH_BOX));
+					userName = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_BOX);
 					if(userName == null) {
 						errors.add(ParameterNames.EMAIL,ErrorCodes.MANDATORY_PARAMETER);
 					}
@@ -503,10 +500,10 @@ public class UsuarioServlet extends HttpServlet {
 			if(!errors.hasErrors()) {
 				try {
 					if(email != null) {
-						a = amigoService.findByEmailAmigo(email, u.getIdUsuario());
+						u = amigoService.findByEmailAmigo(email, u.getIdUsuario());
 					}
 					if(userName != null) {
-						a = amigoService.findByNombreAmigo(userName, u.getIdUsuario());
+						u = amigoService.findByNombreAmigo(userName, u.getIdUsuario());
 					}
 				} catch (Exception ex) {
 					errors.add(ParameterNames.USER, ErrorCodes.FINDER_ERROR);
@@ -520,9 +517,10 @@ public class UsuarioServlet extends HttpServlet {
 				redirect = false;
 				request.setAttribute(AttributeNames.ERRORS, errors);
 			}else {
+				friends.add(u);
 				target = ViewPaths.FRIENDS_FINDER;
 				redirect = false;
-				request.setAttribute(AttributeNames.RESULTS, a);
+				request.setAttribute(AttributeNames.RESULTS, friends);
 			}
 		}
 		
@@ -532,10 +530,13 @@ public class UsuarioServlet extends HttpServlet {
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
 			if(u != null) {
-				id = ValidationUtils.parseInt(request.getParameter(ParameterNames.ID));
+				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 				
 				if(id == null) {
 					errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
+				}
+				if(id==u.getIdUsuario()) {
+					errors.add(ParameterNames.USER, ErrorCodes.ADD_ERROR);
 				}
 			}else {
 				target = ViewPaths.HOME;
@@ -563,6 +564,43 @@ public class UsuarioServlet extends HttpServlet {
 			}
 		}
 		
+		else if(Actions.REMOVE_FRIEND.equalsIgnoreCase(action)) {
+			
+			u = new Usuario();
+			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
+			
+			if(u != null) {
+				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
+				
+				if(id == null) {
+					errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
+				}
+			}else {
+				target = ViewPaths.HOME;
+				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
+			}
+			
+			if(!errors.hasErrors()) {
+				try {
+					amigoService.delete(u.getIdUsuario(), id);
+				}catch (Exception e) {
+					e.printStackTrace();
+					errors.add(ParameterNames.FRIEND, ErrorCodes.REMOVE_ERROR);
+				}
+			}
+			if(errors.hasErrors()) {
+				if(target==null) {
+					target = ViewPaths.USER_PROFILE;
+					redirect = false;
+					request.setAttribute(AttributeNames.USER, u);
+				}
+			}else {
+				target = ViewPaths.USER_PROFILE;
+				redirect = false;
+				request.setAttribute(AttributeNames.USER, u);
+			}
+		}
+		
 		else if(Actions.FIND_MESSAGES.equalsIgnoreCase(action)) {
 			
 			u = new Usuario();
@@ -570,7 +608,7 @@ public class UsuarioServlet extends HttpServlet {
 			
 			if(u !=null) {
 				messages = new ArrayList<Mensaje>();
-				messageType = request.getParameter(ParameterNames.MESSAGE_TYPE);
+				messageType = ValidationUtils.parameterIsEmpty(request, ParameterNames.MESSAGE_TYPE);
 				try {
 					if(ParameterNames.SENDER.equalsIgnoreCase(messageType)) {
 						messages = mensajeService.findByEmisor(u.getIdUsuario());
@@ -586,16 +624,70 @@ public class UsuarioServlet extends HttpServlet {
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
 				target = ViewPaths.HOME;
 			}
-			if(u!=null && !errors.hasErrors()) {
-				target = ViewPaths.MESSAGES;
-				redirect = false;
-				request.setAttribute(AttributeNames.RESULTS, messages);
-			}if(errors.hasErrors()) {
+			
+			if(errors.hasErrors()) {
 				if(target == null) {
 					target = ViewPaths.USER_PROFILE; 
 				}
 				redirect = false;
 				request.setAttribute(AttributeNames.ERRORS, errors);
+			}else{
+				target = ViewPaths.MESSAGES;
+				redirect = false;
+				request.setAttribute(AttributeNames.RESULTS, messages);
+			}
+		}
+		
+		
+		else if(Actions.PRE_SEND_MESSAGE.equalsIgnoreCase(action)) {
+			
+			u = new Usuario();
+		
+			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
+			
+			if(u != null) {
+				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
+				name = ValidationUtils.parameterIsEmpty(request, ParameterNames.NAME);
+				if(id==null) {
+					friends = new ArrayList<Usuario>();
+//					friends = u.getAmigos();
+//					if(friends == null) {
+						try {
+							friends = amigoService.findAmigos(u.getIdUsuario());
+						} catch (Exception e) {
+							errors.add(ParameterNames.FRIEND, ErrorCodes.NOT_FOUND_OBJECT);
+							e.printStackTrace();
+						}
+//					}
+				}
+				if(id!=null && friends!=null) {
+					errors.add(ParameterNames.ID, ErrorCodes.EXCLUSIVE_PARAMETERS);
+					errors.add(ParameterNames.FRIEND, ErrorCodes.EXCLUSIVE_PARAMETERS);
+				}
+				if(id==null && errors.hasErrors()) {
+					errors.add(ParameterNames.USER, ErrorCodes.MANDATORY_PARAMETER);
+				}
+			}else {
+				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
+				target = ViewPaths.HOME;
+			}
+			
+			if(errors.hasErrors()) {
+				if(target == null) {
+					target = ViewPaths.USER_PROFILE;
+				}
+				redirect = false;
+				request.setAttribute(AttributeNames.ERRORS, errors);
+			}else {
+				target = ViewPaths.SEND_MESSAGE;
+				redirect = false;
+				request.setAttribute(AttributeNames.USER, userName);
+				if(id!=null) {
+					request.setAttribute(AttributeNames.ID, id);
+				}
+				if(friends!=null) {
+					request.setAttribute(AttributeNames.RESULTS, friends);
+				}
 			}
 		}
 		
@@ -607,8 +699,8 @@ public class UsuarioServlet extends HttpServlet {
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
 			if(u!=null) {
-				messageContent = ValidationUtils.isEmpty(request.getParameter(ParameterNames.MESSAGE_CONTENT));
-				id = ValidationUtils.parseInt(request.getParameter(ParameterNames.ID));
+				messageContent = ValidationUtils.parameterIsEmpty(request, ParameterNames.MESSAGE_CONTENT);
+				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 				if(messageContent==null) {
 					errors.add(ParameterNames.MESSAGE, ErrorCodes.MANDATORY_PARAMETER);
 				}
@@ -625,19 +717,54 @@ public class UsuarioServlet extends HttpServlet {
 					m.setUsuarioEmisor(u.getIdUsuario());
 					m.setUsuarioReceptor(id);
 					mensajeService.create(m);
-					
-					target = ViewPaths.HOME;
-					redirect = true;
 				}catch(Exception e) {
 					errors.add(ParameterNames.MESSAGE, ErrorCodes.SEND_MESSAGE_ERROR);
 				}
 			}
 			if(errors.hasErrors()) {
 				if(target == null) {
-					target = ViewPaths.PROFILE;
+					target = ViewPaths.USER_PROFILE;
 				}
 				redirect = false;
 				request.setAttribute(AttributeNames.ERRORS, errors);
+			}else {
+				target = ViewPaths.USER_PROFILE;
+				redirect = false;
+				request.setAttribute(AttributeNames.USER, u);
+			}
+		}
+		
+		else if(Actions.REMOVE_MESSAGE.equalsIgnoreCase(action)) {
+			
+			u = new Usuario();
+			
+			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
+			
+			if(u!=null) {
+				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
+				if(id==null) {
+					errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
+				}
+			}else {
+					errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
+					target = ViewPaths.HOME;
+			}
+			if(!errors.hasErrors()){
+				try {
+					mensajeService.delete(id);
+				}catch(Exception e) {
+				}
+			}
+			if(errors.hasErrors()) {
+				if(target == null) {
+					target = ViewPaths.USER_PROFILE;
+				}
+				redirect = false;
+				request.setAttribute(AttributeNames.ERRORS, errors);
+			}else {
+				target = ViewPaths.USER_PROFILE;
+				redirect = false;
+				request.setAttribute(AttributeNames.USER, u);
 			}
 		}
 		RedirectOrForward.send(request, response, redirect, target);

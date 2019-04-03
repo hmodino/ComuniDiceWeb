@@ -13,7 +13,7 @@
 			<input type="hidden" name="<%=ParameterNames.ACTION%>" value="<%=Actions.LOGIN%>"/>
 			<input type="email" name="<%=ParameterNames.EMAIL%>" 
 				placeholder="usuario@ejemplo.com"
-				value="<%=ParamsUtils.getParameter(request, ParameterNames.EMAIL)%>" />
+				value="<%=ValidationUtils.getParameter(request, ParameterNames.EMAIL)%>" />
 				<%
 					parameterErrors = errors.getErrors(ParameterNames.EMAIL);
 					for (String error: parameterErrors) {

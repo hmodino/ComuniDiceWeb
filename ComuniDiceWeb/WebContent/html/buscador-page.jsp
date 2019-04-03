@@ -10,12 +10,13 @@
 		Usuario user = (Usuario) request.getAttribute(AttributeNames.RESULTS);
 		if (user!=null) {
 	%>
-		<a href="/ComuniDiceWeb/usuario?action=<%=Actions.DETAIL_VIEW%>&amp;<%=ParameterNames.ID%>=<%=user.getIdUsuario()%>">
+		<a href="<%=ControllerPaths.USUARIO %>?action=<%=Actions.DETAIL_VIEW%>&amp;<%=ParameterNames.ID%>=<%=user.getIdUsuario()%>">
 			<%=user.getNombreUsuario()%></a>
 			<p><%=user.getDescripcion() %></p>
+			<%if(u!=null){ %>
 			<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.ADD_FRIEND%>&amp;<%=ParameterNames.ID%>=<%=user.getIdUsuario()%>">
-			<img ser="<%=request.getContextPath()%>/imgs/addFriendButton.jpg" width="30px" height="30px" alt="addFriend"></a>
-	<%
+			<img src="<%=request.getContextPath()%>/imgs/addFriendButton.jpg" width="30px" height="30px" alt="addFriend"></a>
+	<%			}
 			}
 		else{
 		%><p>No existen coincidencias</p><%

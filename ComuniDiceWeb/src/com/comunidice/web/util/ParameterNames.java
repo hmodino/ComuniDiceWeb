@@ -1,5 +1,7 @@
 package com.comunidice.web.util;
 
+import java.util.Date;
+
 public interface ParameterNames {
 	
 	public static final String ACTION = "action";
@@ -29,4 +31,22 @@ public interface ParameterNames {
 	public static final String MESSAGE_TYPE = "messageType";
 	public static final String SENDER = "sender";
 	public static final String RECEIVER = "receiver";
+	
+	public static final String START_INDEX = "startIndex";
+	public static final String COUNT = "count";
+	public static final String LANGUAGE = "language";
+	public static final String CATEGORY_ID = "categoryId";
+	public static final String MIN_PRICE = "minPrice";
+	public static final String MAX_PRICE = "maxPrice";
+	public static final String MIN_DATE = "minDate";
+	public static final String MAX_DATE = "maxDate";
+	public static final String FAVS = "favs";
+	public static final String RATING = "rating";
+	public static final String SELLER_ID = "sellerID";
+	public static final String SELLER_TYPE = "sellerType";
+	public static final String MIN_PUBLICATION_YEAR = "minPublicationYear";
+	public static final String MAX_PUBLICATION_YEAR = "maxPublicationYear";
+	public static final String FORMAT = "format";
+	public static final String COVER_TYPE = "coverType";
+	
 }

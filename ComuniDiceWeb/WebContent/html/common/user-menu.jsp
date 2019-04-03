@@ -12,9 +12,10 @@
 			<!-- usuario autenticado -->
 			<div id="usuario">
 				<p><%=u.getNombre()%></p>
-				<a href="/ComuniDiceWeb/usuario?action=<%=Actions.LOGOUT%>">Salir</a>
-				<a href="/ComuniDiceWeb/usuario?action=<%=Actions.PROFILE_VIEW %>">Perfil</a>
-				<a href="/ComuniDiceWeb/usuario?action=<%=Actions.FIND_FRIENDS %>">Amigos</a>
+				<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.LOGOUT%>">Salir</a>
+				<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.PROFILE_VIEW %>">Perfil</a>
+				<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.FIND_FRIENDS %>">Amigos</a>
+				<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.FIND_MESSAGES %>">Mensajes</a>
 			</div>		
 			<%
 		}
