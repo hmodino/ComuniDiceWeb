@@ -15,4 +15,6 @@ public interface ErrorCodes {
 	public static final String SEND_MESSAGE_ERROR = "sendMessageError";
 	public static final String ADD_ERROR = "addError";
 	public static final String REMOVE_ERROR = "removeError";
+	public static final String CREATE_COMMENT_ERROR = "createCommentError";
+	public static final String IDENTITY_ERROR = "identityError";
 }

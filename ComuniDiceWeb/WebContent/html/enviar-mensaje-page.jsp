@@ -17,7 +17,7 @@
 		<%}if(id!=null){%>
 			<input type="hidden" name="<%=ParameterNames.ID%>" value="<%=id%>" readonly>
 		<%} %>
-		<textarea rows="25" cols="100" name="<%=ParameterNames.MESSAGE_CONTENT%>"></textarea>
+		<textarea rows="25" cols="100" name="<%=ParameterNames.CONTENT%>"></textarea>
 		<input type="submit" value="Enviar" />
 	</form>
 	

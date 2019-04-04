@@ -699,7 +699,7 @@ public class UsuarioServlet extends HttpServlet {
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
 			if(u!=null) {
-				messageContent = ValidationUtils.parameterIsEmpty(request, ParameterNames.MESSAGE_CONTENT);
+				messageContent = ValidationUtils.parameterIsEmpty(request, ParameterNames.CONTENT);
 				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 				if(messageContent==null) {
 					errors.add(ParameterNames.MESSAGE, ErrorCodes.MANDATORY_PARAMETER);
@@ -767,7 +767,7 @@ public class UsuarioServlet extends HttpServlet {
 				request.setAttribute(AttributeNames.USER, u);
 			}
 		}
-		RedirectOrForward.send(request, response, redirect, target);
+		RedirectOrForward.send(request, response, redirect, target, true);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 

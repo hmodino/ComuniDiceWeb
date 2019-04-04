@@ -20,4 +20,6 @@ public interface Actions {
 	public static final String REMOVE_MESSAGE = "removeMessage";
 	
 	public static final String SEARCH_PRODUCTS = "searchProducts";
+	public static final String CREATE_COMMENT = "createComment";
+	public static final String DELETE_COMMENT = "deleteComment";
 }

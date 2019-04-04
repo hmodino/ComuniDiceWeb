@@ -27,7 +27,7 @@ public interface ParameterNames {
 	public static final String ID = "id";
 	public static final String FRIEND = "friend";
 	public static final String MESSAGE = "message";
-	public static final String MESSAGE_CONTENT = "messageContent";
+	public static final String CONTENT = "messageContent";
 	public static final String MESSAGE_TYPE = "messageType";
 	public static final String SENDER = "sender";
 	public static final String RECEIVER = "receiver";
@@ -48,5 +48,9 @@ public interface ParameterNames {
 	public static final String MAX_PUBLICATION_YEAR = "maxPublicationYear";
 	public static final String FORMAT = "format";
 	public static final String COVER_TYPE = "coverType";
+	public static final String GAME = "game";
+	public static final String PRODUCT = "product";
+	public static final String COMMENT = "comment";
+	public static final String USER_ID = "userId";
 	
 }
