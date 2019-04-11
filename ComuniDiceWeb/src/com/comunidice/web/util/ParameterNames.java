@@ -32,7 +32,7 @@ public interface ParameterNames {
 	public static final String SENDER = "sender";
 	public static final String RECEIVER = "receiver";
 	
-	public static final String START_INDEX = "startIndex";
+	public static final String PAGE = "page";
 	public static final String COUNT = "count";
 	public static final String LANGUAGE = "language";
 	public static final String CATEGORY_ID = "categoryId";

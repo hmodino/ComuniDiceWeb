@@ -13,6 +13,7 @@ public interface ViewPaths {
 	public static final String MESSAGES = "/html/mensajes-page.jsp";
 	public static final String SEND_MESSAGE = "/html/enviar-mensaje-page.jsp";
 	
+	public static final String PRODUCTS_FINDER = "/hmtl/products-finder-page.jsp";
 	public static final String GAME_DETAIL = "/hmtl/juego-detalle-page.jsp";
 	public static final String PRODUCT_DETAIL = "/hmtl/producto-detalle-page.jsp";
 	

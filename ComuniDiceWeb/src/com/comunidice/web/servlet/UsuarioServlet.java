@@ -48,7 +48,6 @@ public class UsuarioServlet extends HttpServlet {
 	private MensajeService mensajeService = null;
 	
 	
-	
     public UsuarioServlet() {
     	super();
     	service = new UsuarioServiceImpl();
@@ -58,7 +57,7 @@ public class UsuarioServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
-		
+	
 		Errors errors = new Errors();
 		Usuario u = null;
 		Direccion d = null;;
@@ -117,6 +116,8 @@ public class UsuarioServlet extends HttpServlet {
 			if (errors.hasErrors() || u==null) {	
 				if (logger.isDebugEnabled()) {
 					logger.debug("Autenticacion fallida: {}", errors);
+					target = ViewPaths.HOME;
+					redirect = true;
 				}
 				
 				errors.add(ParameterNames.ACTION,ErrorCodes.AUTHENTICATION_ERROR);				

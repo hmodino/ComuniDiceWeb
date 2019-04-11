@@ -106,5 +106,18 @@ public class ValidationUtils {
 		return null;
 		}
 	}
-
+	
+	public static String dateToString(Date date) {
+		
+		DateFormat format = new SimpleDateFormat("yyyy");
+		String s = null;
+		
+		if(date!=null) {
+			s = format.format(date);
+		} else {
+			s = "";
+		}
+		 
+		 return s;
+	}
 }

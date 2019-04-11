@@ -17,14 +17,18 @@ import org.apache.logging.log4j.Logger;
 import com.comunidice.web.model.Errors;
 import com.comunidice.web.util.Actions;
 import com.comunidice.web.util.AttributeNames;
+import com.comunidice.web.util.ConfigurationManager;
+import com.comunidice.web.util.ConfigurationParameterNames;
 import com.comunidice.web.util.ErrorCodes;
 import com.comunidice.web.util.ParameterNames;
+import com.comunidice.web.util.ParameterUtils;
 import com.comunidice.web.util.RedirectOrForward;
 import com.comunidice.web.util.SelectClass;
 import com.comunidice.web.util.SessionManager;
 import com.comunidice.web.util.SetAttribute;
 import com.comunidice.web.util.ValidationUtils;
 import com.comunidice.web.util.ViewPaths;
+import com.comunidice.web.util.WebUtils;
 import com.rollanddice.comunidice.model.Comentario;
 import com.rollanddice.comunidice.model.Criteria;
 import com.rollanddice.comunidice.model.Juego;
@@ -38,6 +42,14 @@ import com.rollanddice.comunidice.service.spi.ProductoService;
 
 @WebServlet("/producto")
 public class ProductoServlet extends HttpServlet {
+	
+	private static int count = Integer.valueOf(
+			ConfigurationManager.getInstance().getParameter(
+					ConfigurationParameterNames.RESULTS_PAGE_SIZE_DEFAULT)); 
+
+	private static int pagingPageCount = Integer.valueOf(
+			ConfigurationManager.getInstance().getParameter(
+					ConfigurationParameterNames.RESULTS_PAGING_PAGE_COUNT)); 
 	
 	private static Logger logger = LogManager.getLogger(ProductoServlet.class);
 	private static ProductoService service = null;
@@ -81,11 +93,15 @@ public class ProductoServlet extends HttpServlet {
 		Date maxPublicationYear = null;
 		Integer format = null;
 		Integer coverType = null;
+		Integer page = null;
 		Integer startIndex = null;
-		Integer count = null;
+		Integer totalPages = null;
+		Integer firstPagedPage = null;
+		Integer lastPagedPage = null;
 		String content = null;
 		Integer userId = null;
 		
+		String url = null;
 		String target = null;
 		Boolean redirect = null;
 		Boolean send = true;
@@ -110,8 +126,8 @@ public class ProductoServlet extends HttpServlet {
 			format = ValidationUtils.parseIntParameter(request, ParameterNames.FORMAT);
 			coverType = ValidationUtils.parseIntParameter(request, ParameterNames.COVER_TYPE);
 			
-			startIndex = ValidationUtils.parseIntParameter(request, ParameterNames.START_INDEX);
-			count = ValidationUtils.parseIntParameter(request, ParameterNames.COUNT);
+			page = WebUtils.getPage(request, ParameterNames.PAGE);
+			startIndex = (page-1)*count+1;
 
 			if(categoryId!=null) {
 				c.setIdCategoria(categoryId);
@@ -164,6 +180,7 @@ public class ProductoServlet extends HttpServlet {
 				try {
 					games = service.findJuegoByCriteria(c, startIndex, count);
 					gs = games.getPage();
+					totalPages = (int) Math.ceil((double)games.getTotal()/(double)count);
 					
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -175,7 +192,7 @@ public class ProductoServlet extends HttpServlet {
 				try {
 					products = service.findByCriteria(c, language, startIndex, count);
 					ps = products.getPage();
-					
+					totalPages = (int) Math.ceil((double)products.getTotal()/(double)count);
 				} catch (Exception e) {
 					e.printStackTrace();
 					errors.add(ParameterNames.PRODUCT, ErrorCodes.NOT_FOUND_OBJECT);
@@ -190,19 +207,27 @@ public class ProductoServlet extends HttpServlet {
 				redirect = false;
 				if(game) {
 					SetAttribute.setResult(request, gs);
+
 				}else {
 					SetAttribute.setResult(request, ps);
 				}
+				firstPagedPage = Math.max(1, page-pagingPageCount);
+				lastPagedPage = Math.min(totalPages, page+pagingPageCount);
+				url = ParameterUtils.criteriaURLBuilder(c);
+				SetAttribute.setOthers(request, ParameterNames.PAGE, page);
+				SetAttribute.setOthers(request, AttributeNames.TOTAL_PAGES, totalPages);
+				SetAttribute.setOthers(request, AttributeNames.FIRST_PAGED_PAGE, firstPagedPage);
+				SetAttribute.setOthers(request, AttributeNames.LAST_PAGED_PAGE, lastPagedPage);
+				SetAttribute.setOthers(request, AttributeNames.URL, url);
 			}
 		}
 		
 		else if(Actions.DETAIL_VIEW.equalsIgnoreCase(action)) {
-
-			g = new Juego();
 			
 			id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 			
 			if(id!=null) {
+				g = new Juego();
 				try {
 					g = service.findJuegoById(id);
 				} catch (Exception e) {
