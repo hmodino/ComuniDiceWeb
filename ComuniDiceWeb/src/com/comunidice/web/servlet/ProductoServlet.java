@@ -15,6 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.comunidice.web.model.Errors;
+import com.comunidice.web.model.ShoppingCart;
+import com.comunidice.web.model.ShoppingCartLine;
 import com.comunidice.web.util.Actions;
 import com.comunidice.web.util.AttributeNames;
 import com.comunidice.web.util.ConfigurationManager;
@@ -30,14 +32,21 @@ import com.comunidice.web.util.ValidationUtils;
 import com.comunidice.web.util.ViewPaths;
 import com.comunidice.web.util.WebUtils;
 import com.rollanddice.comunidice.model.Comentario;
+import com.rollanddice.comunidice.model.Compra;
 import com.rollanddice.comunidice.model.Criteria;
+import com.rollanddice.comunidice.model.Favorito;
 import com.rollanddice.comunidice.model.Juego;
+import com.rollanddice.comunidice.model.LineaCompra;
 import com.rollanddice.comunidice.model.Producto;
 import com.rollanddice.comunidice.model.Results;
 import com.rollanddice.comunidice.model.Usuario;
 import com.rollanddice.comunidice.service.impl.ComentarioServiceImpl;
+import com.rollanddice.comunidice.service.impl.CompraServiceImpl;
+import com.rollanddice.comunidice.service.impl.FavoritoServiceImpl;
 import com.rollanddice.comunidice.service.impl.ProductoServiceImpl;
 import com.rollanddice.comunidice.service.spi.ComentarioService;
+import com.rollanddice.comunidice.service.spi.CompraService;
+import com.rollanddice.comunidice.service.spi.FavoritoService;
 import com.rollanddice.comunidice.service.spi.ProductoService;
 
 @WebServlet("/producto")
@@ -54,11 +63,15 @@ public class ProductoServlet extends HttpServlet {
 	private static Logger logger = LogManager.getLogger(ProductoServlet.class);
 	private static ProductoService service = null;
 	private static ComentarioService commentService = null;
-
+	private static FavoritoService favouriteService = null;
+	private static CompraService buyService = null;
+	
     public ProductoServlet() {
         super();
         service = new ProductoServiceImpl();
         commentService = new ComentarioServiceImpl();
+        favouriteService = new FavoritoServiceImpl();
+        buyService = new CompraServiceImpl();
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -69,11 +82,18 @@ public class ProductoServlet extends HttpServlet {
 		Criteria c = null;
 		Comentario comment = null;
 		Usuario u = null;
+		Favorito f = null;
+		ShoppingCart cart = null;
+		ShoppingCartLine cartLine = null;
+		Compra buy = null;
+		LineaCompra buyLine = null;
 		
 		Results<Producto> products = null;
 		Results<Juego> games = null;
 		List<Juego> gs = null;
 		List<Producto> ps = null;
+		List<ShoppingCartLine> cartLines = null;
+		List<LineaCompra> buyLines = null;
 		
 		String action = ValidationUtils.parameterIsEmpty(request, ParameterNames.ACTION);
 		
@@ -100,15 +120,21 @@ public class ProductoServlet extends HttpServlet {
 		Integer lastPagedPage = null;
 		String content = null;
 		Integer userId = null;
+		Double rate = null;
+		Boolean favourite = null;
+		Integer quantity = null;
+		Double total = null;
 		
 		String url = null;
 		String target = null;
 		Boolean redirect = null;
 		Boolean send = true;
 		
+		Boolean game = null;
+		Boolean exist = null;
+		
 		if(Actions.SEARCH_PRODUCTS.equalsIgnoreCase(action)) {
-			
-			Boolean game = null;
+		
 			c = new Criteria();
 			
 			categoryId = ValidationUtils.parseIntParameter(request, ParameterNames.CATEGORY_ID);
@@ -214,6 +240,39 @@ public class ProductoServlet extends HttpServlet {
 				firstPagedPage = Math.max(1, page-pagingPageCount);
 				lastPagedPage = Math.min(totalPages, page+pagingPageCount);
 				url = ParameterUtils.criteriaURLBuilder(c);
+				SetAttribute.setOthers(request, ParameterNames.PAGE, page);
+				SetAttribute.setOthers(request, AttributeNames.TOTAL_PAGES, totalPages);
+				SetAttribute.setOthers(request, AttributeNames.FIRST_PAGED_PAGE, firstPagedPage);
+				SetAttribute.setOthers(request, AttributeNames.LAST_PAGED_PAGE, lastPagedPage);
+				SetAttribute.setOthers(request, AttributeNames.URL, url);
+			}
+		}
+		
+		else if(Actions.DEFAULT_SEARCH.equalsIgnoreCase(action)) {
+			
+			ps = new ArrayList<Producto>();
+			products = new Results<Producto>(ps, startIndex, count);
+			c = new Criteria();
+			c.setValoracion(4);
+			
+			page = WebUtils.getPage(request, ParameterNames.PAGE);
+			startIndex = (page-1)*count+1;
+			
+			try {
+				products = service.findByCriteria(c, language, startIndex, count);
+			}catch(Exception e) {
+				errors.add(ParameterNames.PRODUCT, ErrorCodes.NOT_FOUND_OBJECT);
+			}
+			if(!errors.hasErrors()) {
+				
+				ps = products.getPage();
+				
+				totalPages = (int) Math.ceil((double)products.getTotal()/(double)count);
+				firstPagedPage = Math.max(1, page-pagingPageCount);
+				lastPagedPage = Math.min(totalPages, page+pagingPageCount);
+				url = ParameterUtils.criteriaURLBuilder(c);
+				
+				SetAttribute.setOthers(request, AttributeNames.PRODUCTS, ps);
 				SetAttribute.setOthers(request, ParameterNames.PAGE, page);
 				SetAttribute.setOthers(request, AttributeNames.TOTAL_PAGES, totalPages);
 				SetAttribute.setOthers(request, AttributeNames.FIRST_PAGED_PAGE, firstPagedPage);
@@ -352,6 +411,296 @@ public class ProductoServlet extends HttpServlet {
 				 * Llamada Ajax
 				 */
 				send = false;
+			}
+		}
+		
+		else if(Actions.FAVOURITE.equalsIgnoreCase(action)) {
+			
+			u = new Usuario();
+			
+			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
+			id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
+			userId = ValidationUtils.parseIntParameter(request, ParameterNames.USER_ID);
+			rate = ValidationUtils.parseDoubleParameter(request, ParameterNames.RATE);
+			favourite = ValidationUtils.parseBooleanParameter(request, ParameterNames.FAVOURITE);
+			
+			if(u!=null) {
+				f = new Favorito();
+				
+				if(rate!=null) {
+					f.setValoracion(rate);
+				}
+				if(u.getIdUsuario().equals(userId)) {
+					f.setUsuario(userId);
+				}else {
+					errors.add(ParameterNames.ID, ErrorCodes.IDENTITY_ERROR);
+				}
+				f.setFavorito(favourite);
+				f.setProducto(id);
+				if(rate==null && favourite==false) {
+					errors.add(ParameterNames.FAVOURITE, ErrorCodes.MANDATORY_PARAMETER);
+					errors.add(ParameterNames.RATE, ErrorCodes.MANDATORY_PARAMETER);
+				}
+				if(!errors.hasErrors()) {
+					try {
+						exist = favouriteService.exist(userId, id);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					if(exist) {
+						try {
+							favouriteService.update(f);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}else {
+						try {
+							favouriteService.create(f);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+		
+		else if(Actions.ADD_TO_CART.equalsIgnoreCase(action)) {
+			
+			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
+			 
+			if(u!=null) {
+				cart = (ShoppingCart) SessionManager.get(request, AttributeNames.SHOPPING_CART);
+				if(cart == null) {
+					cart = new ShoppingCart();
+				}
+				
+				cartLines = cart.getLine();
+				 
+				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
+				if(id!=null) {
+					try {
+						g = service.findJuegoById(id);
+					} catch(Exception e) {
+						errors.add(ParameterNames.GAME, ErrorCodes.FINDER_ERROR);
+						 
+					}
+					if(g == null) {
+						language = (String) SessionManager.get(request, AttributeNames.LANGUAGE);
+						try {
+							p = service.findById(id, language);
+						}catch(Exception e) {
+							errors.add(ParameterNames.PRODUCT, ErrorCodes.FINDER_ERROR);
+						}
+						if(p!=null && !errors.hasErrors()) {
+							int index = cartLines.indexOf(p);
+							if(index!=-1) {
+								cartLine = cartLines.get(index);
+								quantity = cartLine.getQuantity();
+								quantity++;
+								cartLine.setQuantity(quantity);
+								cartLines.add(index, cartLine);
+							} else {
+								cartLine = new ShoppingCartLine();
+								cartLine.setProduct(p);
+								cartLine.setQuantity(1);
+								cartLine.setGame(false);
+								cartLines.add(cartLine);
+							}
+							total = cart.getTotal();
+							if(total!=null) {
+								total = total+p.getPrecio()*quantity;
+							} else {
+								total = p.getPrecio()*quantity;
+							}
+						}
+					} if (g!=null && !errors.hasErrors()){
+						int index = cartLines.indexOf(g);
+						if(index!=-1) {
+							cartLine = cartLines.get(index);
+							quantity = cartLine.getQuantity();
+							quantity++;
+							cartLine.setQuantity(quantity);
+							cartLines.add(index, cartLine);
+						} else {
+							cartLine = new ShoppingCartLine();
+							cartLine.setProduct(g);
+							cartLine.setQuantity(1);
+							cartLine.setGame(true);
+							cartLines.add(cartLine);
+						}
+						total = cart.getTotal();
+						if(total!=null) {
+							total = total+g.getPrecio()*quantity;
+						} else {
+							total = g.getPrecio()*quantity;
+						}
+					}
+					if(!errors.hasErrors()) {
+						cart.setLine(cartLines);
+						cart.setTotal(total);
+						cart.setShippingCosts(cartLines.size()*0.5);
+						SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
+					}
+				} else {
+					errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
+				}
+			} else {
+				target = ViewPaths.LOGIN;
+				redirect = true;
+			}
+		}
+		
+		else if(Actions.REMOVE_FROM_CART.equalsIgnoreCase(action)) {
+			
+			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
+			 
+			if(u!=null) {
+				cart = (ShoppingCart) SessionManager.get(request, AttributeNames.SHOPPING_CART);
+
+				cartLines = cart.getLine();
+				 
+				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
+				if(id!=null) {
+					try {
+						g = service.findJuegoById(id);
+					} catch(Exception e) {
+						errors.add(ParameterNames.GAME, ErrorCodes.FINDER_ERROR);	 
+					}
+					if(g == null) {
+						language = (String) SessionManager.get(request, AttributeNames.LANGUAGE);
+						try {
+							p = service.findById(id, language);
+						}catch(Exception e) {
+							errors.add(ParameterNames.PRODUCT, ErrorCodes.FINDER_ERROR);
+						}
+						if(p!=null && !errors.hasErrors()) {
+							int index = cartLines.indexOf(p);
+							if(index!=-1) {
+								cartLines.remove(index);
+								total = cart.getTotal();
+								p = (Producto) cartLines.get(index).getProduct();
+								quantity = cartLines.get(index).getQuantity();
+								total = total-p.getPrecio()*quantity;
+							}
+						}
+					} if(g!=null && !errors.hasErrors()) {
+						int index = cartLines.indexOf(g);
+						if(index!=-1) {
+							cartLines.remove(index);
+							total = cart.getTotal();
+							g = (Juego) cartLines.get(index).getProduct();
+							quantity = cartLines.get(index).getQuantity();
+							total = total-p.getPrecio()*quantity;
+						}
+					}
+					
+					if(!errors.hasErrors()) {
+						cart.setLine(cartLines);
+						cart.setTotal(total);
+						cart.setShippingCosts(cartLines.size()*0.5);
+						SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
+					}
+				} else {
+					errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
+				}
+			} else {
+				target = ViewPaths.LOGIN;
+				redirect = true;
+			}
+		}
+		
+		else if(Actions.CLEAR_CART.equalsIgnoreCase(action)) {
+			
+			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
+			 
+			if(u!=null) {
+				cart = new ShoppingCart();
+				SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
+			}
+		}
+		
+		else if(Actions.MODIFY_QUANTITY.equalsIgnoreCase(action)) {
+			
+			u = (Usuario)SessionManager.get(request, AttributeNames.USER);
+			
+			if(u!=null) {
+				
+				cart = (ShoppingCart) SessionManager.get(request, AttributeNames.SHOPPING_CART);
+
+				cartLines = cart.getLine();
+				
+				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
+				if(id!=null) {
+					quantity = ValidationUtils.parseIntParameter(request, ParameterNames.QUANTITY);
+					if(quantity!=null) {
+						try {
+							g = service.findJuegoById(id);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						if(g==null) {
+							language = (String) SessionManager.get(request, AttributeNames.LANGUAGE);
+							try {
+								p = service.findById(id, language);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+							if(p!=null && !errors.hasErrors()) {
+								int index = cartLines.indexOf(p);
+								if(index!=-1) {
+									cartLines.get(index).setQuantity(quantity);
+								}
+							}
+						} else {
+							int index = cartLines.indexOf(g);
+							if(index!=-1) {
+								cartLines.get(index).setQuantity(quantity);
+							}
+						}
+						SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
+					}
+				}
+			}
+		}
+		
+		else if(Actions.BUY.equalsIgnoreCase(action)) {
+			
+			u = (Usuario)SessionManager.get(request, AttributeNames.USER);
+			
+			if(u!= null) {
+				cart = (ShoppingCart)SessionManager.get(request, AttributeNames.SHOPPING_CART);
+				if(cart!=null) {
+					cartLines = cart.getLine();
+					for(ShoppingCartLine line:cartLines) {
+						line.getGame();
+						if(game) {
+							g = (Juego) line.getProduct();
+							id = g.getIdProducto();
+							total = g.getPrecio();
+						} else {
+							p = (Producto) line.getProduct();
+							id = p.getIdProducto();
+							total = g.getPrecio();
+						}
+						quantity = line.getQuantity();
+						buyLine.setCantidad(quantity);
+						buyLine.setIdProducto(id);
+						buyLine.setPrecioUnitario(total);
+						buyLines.add(buyLine);
+					}
+					buy.setIdUsuario(u.getIdUsuario());
+					buy.setGastosEnvio(cart.getShippingCosts());
+					buy.setSubtotal(cart.getTotal()-cart.getShippingCosts());
+					buy.setTotal(cart.getTotal());
+					buy.setModoPago(1);
+					try {
+						buyService.create(buy, buyLines);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 		RedirectOrForward.send(request, response, redirect, target, send);

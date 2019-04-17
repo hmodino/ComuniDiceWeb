@@ -52,5 +52,9 @@ public interface ParameterNames {
 	public static final String PRODUCT = "product";
 	public static final String COMMENT = "comment";
 	public static final String USER_ID = "userId";
-	
+	public static final String RATE = "rate";
+	public static final String FAVOURITE = "favourite";
+	public static final String TRUE = "true";
+	public static final String FALSE = "false";
+	public static final String QUANTITY = "quantity";
 }

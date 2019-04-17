@@ -120,4 +120,16 @@ public class ValidationUtils {
 		 
 		 return s;
 	}
+	
+	public static Boolean parseBooleanParameter(HttpServletRequest request, String s) {
+		
+		Boolean b = null;
+		if(ParameterNames.TRUE.equalsIgnoreCase(s)) {
+			b = true;
+		}else {
+			b = false;
+		}
+		return b;
+		
+	}
 }

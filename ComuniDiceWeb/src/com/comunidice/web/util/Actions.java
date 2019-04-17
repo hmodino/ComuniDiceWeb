@@ -20,6 +20,13 @@ public interface Actions {
 	public static final String REMOVE_MESSAGE = "removeMessage";
 	
 	public static final String SEARCH_PRODUCTS = "searchProducts";
+	public static final String DEFAULT_SEARCH = "defaultSearch";
 	public static final String CREATE_COMMENT = "createComment";
 	public static final String DELETE_COMMENT = "deleteComment";
+	public static final String FAVOURITE = "favouriteExist";
+	public static final String ADD_TO_CART = "addToCart";
+	public static final String REMOVE_FROM_CART = "removeFromCart";
+	public static final String CLEAR_CART = "clearCart";
+	public static final String MODIFY_QUANTITY = "modifyQuantity";
+	public static final String BUY = "buy";
 }
