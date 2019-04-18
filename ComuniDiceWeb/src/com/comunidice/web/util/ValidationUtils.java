@@ -76,7 +76,6 @@ public class ValidationUtils {
 				date = format.parse(s);
 				return date;
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return null;
 			}

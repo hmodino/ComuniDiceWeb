@@ -17,7 +17,7 @@ public class SetAttribute {
 		request.setAttribute(AttributeNames.USER, u);
 	}
 	
-	public static final void setResults(HttpServletRequest request, List<Object> results) {
+	public static final <T> void setResults(HttpServletRequest request, List<T> results) {
 		request.setAttribute(AttributeNames.RESULTS, results);
 	}
 	

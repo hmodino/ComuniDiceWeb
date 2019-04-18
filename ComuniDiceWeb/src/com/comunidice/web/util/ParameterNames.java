@@ -1,7 +1,5 @@
 package com.comunidice.web.util;
 
-import java.util.Date;
-
 public interface ParameterNames {
 	
 	public static final String ACTION = "action";
@@ -57,4 +55,8 @@ public interface ParameterNames {
 	public static final String TRUE = "true";
 	public static final String FALSE = "false";
 	public static final String QUANTITY = "quantity";
+	
+	public static final String SEARCH_TYPE = "searchType";
+	public static final String SEARCH_USER = "searchUser";
+	public static final String SEARCH_PRODUCT = "searchProduct";
 }

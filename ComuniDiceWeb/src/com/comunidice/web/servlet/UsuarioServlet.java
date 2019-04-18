@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.comunidice.web.model.Errors;
+import com.comunidice.web.model.ShoppingCart;
 import com.comunidice.web.util.Actions;
 import com.comunidice.web.util.AttributeNames;
 import com.comunidice.web.util.ErrorCodes;
@@ -21,11 +22,9 @@ import com.comunidice.web.util.ParameterNames;
 import com.comunidice.web.util.RedirectOrForward;
 import com.comunidice.web.util.SessionAttributeNames;
 import com.comunidice.web.util.SessionManager;
+import com.comunidice.web.util.SetAttribute;
 import com.comunidice.web.util.ValidationUtils;
 import com.comunidice.web.util.ViewPaths;
-import com.rollanddice.comunidice.exception.DataException;
-import com.rollanddice.comunidice.exception.ServiceException;
-import com.rollanddice.comunidice.model.Amigo;
 import com.rollanddice.comunidice.model.Direccion;
 import com.rollanddice.comunidice.model.Mensaje;
 import com.rollanddice.comunidice.model.Pais;
@@ -64,7 +63,8 @@ public class UsuarioServlet extends HttpServlet {
 		Region r = null;
 		Pais p = null;
 		Mensaje m = null;
-		
+		ShoppingCart cart = null;
+
 		List<Mensaje> messages = null;
 		List<Usuario> friends = null;
 
@@ -92,7 +92,7 @@ public class UsuarioServlet extends HttpServlet {
 		String messageType = null;
 		String messageContent = null;
 
-		Boolean redirect = null;
+		Boolean redirect = false;
 		
 		if (Actions.LOGIN.equalsIgnoreCase(action)) {
 			
@@ -121,10 +121,12 @@ public class UsuarioServlet extends HttpServlet {
 				}
 				
 				errors.add(ParameterNames.ACTION,ErrorCodes.AUTHENTICATION_ERROR);				
-				request.setAttribute(AttributeNames.ERRORS, errors);				
+				SetAttribute.setErrors(request, errors);
 				target = ViewPaths.LOGIN;
 			} else {
-				SessionManager.set(request, SessionAttributeNames.USER, u);		
+				cart = new ShoppingCart();
+				SessionManager.set(request, SessionAttributeNames.USER, u);
+				SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
 				target = ViewPaths.HOME;
 				redirect = true;
 			}
@@ -133,6 +135,7 @@ public class UsuarioServlet extends HttpServlet {
 		else if(Actions.LOGOUT.equalsIgnoreCase(action)) {
 			
 			SessionManager.set(request, SessionAttributeNames.USER, null);
+			SessionManager.set(request, AttributeNames.SHOPPING_CART, null);
 			target = ViewPaths.HOME;
 			redirect = true;
 		}
@@ -173,11 +176,11 @@ public class UsuarioServlet extends HttpServlet {
 				errors.add(ParameterNames.ACTION,ErrorCodes.NOT_FOUND_OBJECT);
 				target = ViewPaths.BUSCADOR;
 				redirect = false;
-				request.setAttribute(AttributeNames.ERRORS, errors);
+				SetAttribute.setErrors(request, errors);
 			}else {
 				target = ViewPaths.BUSCADOR;
 				redirect = false;
-				request.setAttribute(AttributeNames.RESULTS, u);
+				SetAttribute.setResult(request, u);
 			}
 		}
 		
@@ -276,7 +279,7 @@ public class UsuarioServlet extends HttpServlet {
 				}				
 				target = ViewPaths.SIGNUP;
 				redirect = false;
-				request.setAttribute(AttributeNames.ERRORS, errors);
+				SetAttribute.setErrors(request, errors);
 			}else {
 				try {
 					service.signUp(u, d);
@@ -287,14 +290,13 @@ public class UsuarioServlet extends HttpServlet {
 					errors.add(ParameterNames.USER, ErrorCodes.SIGN_UP_ERROR);
 					target = ViewPaths.SIGNUP;
 					redirect = false;
-					request.setAttribute(AttributeNames.ERRORS, errors);
+					SetAttribute.setErrors(request, errors);
 				}
 			}
 		}
 		
 		else if(Actions.EDIT.equalsIgnoreCase(action)) {
 
-			u = new Usuario();
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
 			name = ValidationUtils.parameterIsEmpty(request, ParameterNames.NAME);
@@ -376,25 +378,25 @@ public class UsuarioServlet extends HttpServlet {
 				}				
 				target = ViewPaths.USER_PROFILE;
 				redirect = false;
-				request.setAttribute(AttributeNames.ERRORS, errors);
+				SetAttribute.setErrors(request, errors);
 			}else {
 				try {
 					service.editar(u, d);	
-					request.setAttribute(AttributeNames.USER, u);
+					SetAttribute.setResult(request, u);
+					SessionManager.set(request, AttributeNames.USER, u);
 					target = ViewPaths.USER_PROFILE;
 					redirect = false;
 				} catch (Exception e) {
 					errors.add(ParameterNames.USER, ErrorCodes.UPDATE_ERROR);
 					target = ViewPaths.USER_PROFILE;
 					redirect = false;
-					request.setAttribute(AttributeNames.ERRORS, errors);
+					SetAttribute.setErrors(request, errors);
 				}
 			}
 		}
 		
 		else if(Actions.DETAIL_VIEW.equalsIgnoreCase(action)) {
-			
-			u = new Usuario();
+		
 			id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 			
 			if(id != null) {
@@ -412,7 +414,7 @@ public class UsuarioServlet extends HttpServlet {
 			request.setAttribute(AttributeNames.USER, u);
 			target = ViewPaths.PROFILE;
 			redirect = false;
-			request.setAttribute(AttributeNames.USER, u);
+			SetAttribute.setResult(request, u);
 			}
 			else{
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
@@ -420,31 +422,29 @@ public class UsuarioServlet extends HttpServlet {
 			if(errors.hasErrors()) {
 				target = ViewPaths.HOME;
 				redirect = false;
-				request.setAttribute(AttributeNames.ERRORS, errors);
+				SetAttribute.setErrors(request, errors);
 				
 			}
 		}
 		
 		else if(Actions.PROFILE_VIEW.equalsIgnoreCase(action)) {
 			
-			u = new Usuario();
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
 			if(u==null) {
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
 				target = ViewPaths.HOME;
 				redirect = false;
-				request.setAttribute(AttributeNames.ERRORS, errors);
+				SetAttribute.setErrors(request, errors);
 			}else {
 				target = ViewPaths.USER_PROFILE;
 				redirect = false;
-				request.setAttribute(AttributeNames.USER, u);
+				SetAttribute.setResult(request, u);
 			}
 		} 
 		
 		else if(Actions.FIND_FRIENDS.equalsIgnoreCase(action)) {
 			
-			u = new Usuario();
 			u = (Usuario)SessionManager.get(request, AttributeNames.USER);
 			
 			if(u != null) {
@@ -465,20 +465,17 @@ public class UsuarioServlet extends HttpServlet {
 					target = ViewPaths.USER_PROFILE;
 				}
 				redirect = false;
-				request.setAttribute(AttributeNames.ERRORS, errors);
+				SetAttribute.setErrors(request, errors);
 				
 			}else {
 				target = ViewPaths.FRIENDS_FINDER;
 				redirect = false;
-				request.setAttribute(AttributeNames.RESULTS, friends);
+				SetAttribute.setResults(request, friends);
 			}
 		}
 		
 		else if(Actions.FIND_FRIENDS_BY.equalsIgnoreCase(action)) {
 
-			u = new Usuario();
-			friends = new ArrayList<Usuario>();
-			
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			searchBy = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_BY);
 			
@@ -516,18 +513,17 @@ public class UsuarioServlet extends HttpServlet {
 					target = ViewPaths.USER_PROFILE;
 				}
 				redirect = false;
-				request.setAttribute(AttributeNames.ERRORS, errors);
+				SetAttribute.setErrors(request, errors);
 			}else {
 				friends.add(u);
 				target = ViewPaths.FRIENDS_FINDER;
 				redirect = false;
-				request.setAttribute(AttributeNames.RESULTS, friends);
+				SetAttribute.setResults(request, friends);
 			}
 		}
 		
 		else if(Actions.ADD_FRIEND.equalsIgnoreCase(action)) {
 			
-			u = new Usuario();
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
 			if(u != null) {
@@ -541,6 +537,7 @@ public class UsuarioServlet extends HttpServlet {
 				}
 			}else {
 				target = ViewPaths.HOME;
+				redirect = true;
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
 			}
 			
@@ -556,18 +553,17 @@ public class UsuarioServlet extends HttpServlet {
 				if(target==null) {
 					target = ViewPaths.USER_PROFILE;
 					redirect = false;
-					request.setAttribute(AttributeNames.USER, u);
+					SetAttribute.setUser(request, u);
 				}
 			}else {
 				target = ViewPaths.USER_PROFILE;
 				redirect = false;
-				request.setAttribute(AttributeNames.USER, u);
+				SetAttribute.setUser(request, u);
 			}
 		}
 		
 		else if(Actions.REMOVE_FRIEND.equalsIgnoreCase(action)) {
 			
-			u = new Usuario();
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
 			if(u != null) {
@@ -593,18 +589,17 @@ public class UsuarioServlet extends HttpServlet {
 				if(target==null) {
 					target = ViewPaths.USER_PROFILE;
 					redirect = false;
-					request.setAttribute(AttributeNames.USER, u);
+					SetAttribute.setUser(request, u);
 				}
 			}else {
 				target = ViewPaths.USER_PROFILE;
 				redirect = false;
-				request.setAttribute(AttributeNames.USER, u);
+				SetAttribute.setUser(request, u);
 			}
 		}
 		
 		else if(Actions.FIND_MESSAGES.equalsIgnoreCase(action)) {
 			
-			u = new Usuario();
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
 			if(u !=null) {
@@ -631,19 +626,17 @@ public class UsuarioServlet extends HttpServlet {
 					target = ViewPaths.USER_PROFILE; 
 				}
 				redirect = false;
-				request.setAttribute(AttributeNames.ERRORS, errors);
+				SetAttribute.setErrors(request, errors);
 			}else{
 				target = ViewPaths.MESSAGES;
 				redirect = false;
-				request.setAttribute(AttributeNames.RESULTS, messages);
+				SetAttribute.setResults(request, messages);
 			}
 		}
 		
 		
 		else if(Actions.PRE_SEND_MESSAGE.equalsIgnoreCase(action)) {
 			
-			u = new Usuario();
-		
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
 			if(u != null) {
@@ -651,15 +644,12 @@ public class UsuarioServlet extends HttpServlet {
 				name = ValidationUtils.parameterIsEmpty(request, ParameterNames.NAME);
 				if(id==null) {
 					friends = new ArrayList<Usuario>();
-//					friends = u.getAmigos();
-//					if(friends == null) {
 						try {
 							friends = amigoService.findAmigos(u.getIdUsuario());
 						} catch (Exception e) {
 							errors.add(ParameterNames.FRIEND, ErrorCodes.NOT_FOUND_OBJECT);
 							e.printStackTrace();
 						}
-//					}
 				}
 				if(id!=null && friends!=null) {
 					errors.add(ParameterNames.ID, ErrorCodes.EXCLUSIVE_PARAMETERS);
@@ -678,25 +668,23 @@ public class UsuarioServlet extends HttpServlet {
 					target = ViewPaths.USER_PROFILE;
 				}
 				redirect = false;
-				request.setAttribute(AttributeNames.ERRORS, errors);
+				SetAttribute.setErrors(request, errors);
 			}else {
 				target = ViewPaths.SEND_MESSAGE;
 				redirect = false;
-				request.setAttribute(AttributeNames.USER, userName);
+				SetAttribute.setOthers(request, AttributeNames.USER, userName);
 				if(id!=null) {
-					request.setAttribute(AttributeNames.ID, id);
+					SetAttribute.setOthers(request, AttributeNames.ID, id);
 				}
 				if(friends!=null) {
-					request.setAttribute(AttributeNames.RESULTS, friends);
+					SetAttribute.setResults(request, friends);
 				}
 			}
 		}
 		
 		else if(Actions.SEND_MESSAGE.equalsIgnoreCase(action)) {
 			
-			u = new Usuario();
 			m = new Mensaje();
-			
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
 			if(u!=null) {
@@ -724,20 +712,19 @@ public class UsuarioServlet extends HttpServlet {
 			}
 			if(errors.hasErrors()) {
 				if(target == null) {
+					SetAttribute.setUser(request, u);
 					target = ViewPaths.USER_PROFILE;
 				}
 				redirect = false;
-				request.setAttribute(AttributeNames.ERRORS, errors);
+				SetAttribute.setErrors(request, errors);
 			}else {
 				target = ViewPaths.USER_PROFILE;
 				redirect = false;
-				request.setAttribute(AttributeNames.USER, u);
+				SetAttribute.setUser(request, u);
 			}
 		}
 		
 		else if(Actions.REMOVE_MESSAGE.equalsIgnoreCase(action)) {
-			
-			u = new Usuario();
 			
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
@@ -758,14 +745,15 @@ public class UsuarioServlet extends HttpServlet {
 			}
 			if(errors.hasErrors()) {
 				if(target == null) {
+					SetAttribute.setUser(request, u);
 					target = ViewPaths.USER_PROFILE;
 				}
 				redirect = false;
-				request.setAttribute(AttributeNames.ERRORS, errors);
+				SetAttribute.setErrors(request, errors);
 			}else {
 				target = ViewPaths.USER_PROFILE;
 				redirect = false;
-				request.setAttribute(AttributeNames.USER, u);
+				SetAttribute.setUser(request, u);
 			}
 		}
 		RedirectOrForward.send(request, response, redirect, target, true);

@@ -30,6 +30,7 @@ import com.comunidice.web.util.SessionManager;
 import com.comunidice.web.util.SetAttribute;
 import com.comunidice.web.util.ValidationUtils;
 import com.comunidice.web.util.ViewPaths;
+import com.comunidice.web.util.WebConstants;
 import com.comunidice.web.util.WebUtils;
 import com.rollanddice.comunidice.model.Comentario;
 import com.rollanddice.comunidice.model.Compra;
@@ -138,7 +139,7 @@ public class ProductoServlet extends HttpServlet {
 			c = new Criteria();
 			
 			categoryId = ValidationUtils.parseIntParameter(request, ParameterNames.CATEGORY_ID);
-			name = ValidationUtils.parameterIsEmpty(request, ParameterNames.NAME);
+			name = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_BOX);
 			minPrice = ValidationUtils.parseDoubleParameter(request, ParameterNames.MIN_PRICE);
 			maxPrice = ValidationUtils.parseDoubleParameter(request, ParameterNames.MAX_PRICE);
 			minDate = ValidationUtils.parameterDateFormat(request, ParameterNames.MIN_DATE);
@@ -154,6 +155,8 @@ public class ProductoServlet extends HttpServlet {
 			
 			page = WebUtils.getPage(request, ParameterNames.PAGE);
 			startIndex = (page-1)*count+1;
+			
+			language = SessionManager.get(request, WebConstants.USER_LOCALE).toString();
 
 			if(categoryId!=null) {
 				c.setIdCategoria(categoryId);
@@ -225,11 +228,11 @@ public class ProductoServlet extends HttpServlet {
 				}
 			}
 			if(errors.hasErrors()) {
-				target = ViewPaths.BUSCADOR;
+				target = ViewPaths.HOME;
 				redirect = false;
 				SetAttribute.setErrors(request, errors);
 			}else {
-				target = ViewPaths.BUSCADOR;
+				target = ViewPaths.PRODUCTS_FINDER;
 				redirect = false;
 				if(game) {
 					SetAttribute.setResult(request, gs);
@@ -372,7 +375,6 @@ public class ProductoServlet extends HttpServlet {
 		
 		else if(Actions.DELETE_COMMENT.equalsIgnoreCase(action)) {
 			
-			u = new Usuario();
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			if(u!=null) {
 				userId = ValidationUtils.parseIntParameter(request, ParameterNames.USER_ID);
@@ -416,9 +418,8 @@ public class ProductoServlet extends HttpServlet {
 		
 		else if(Actions.FAVOURITE.equalsIgnoreCase(action)) {
 			
-			u = new Usuario();
-			
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
+			
 			id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 			userId = ValidationUtils.parseIntParameter(request, ParameterNames.USER_ID);
 			rate = ValidationUtils.parseDoubleParameter(request, ParameterNames.RATE);
