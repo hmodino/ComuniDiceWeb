@@ -230,6 +230,7 @@ public class ProductoServlet extends HttpServlet {
 			if(errors.hasErrors()) {
 				target = ViewPaths.HOME;
 				redirect = false;
+				
 				SetAttribute.setErrors(request, errors);
 			}else {
 				target = ViewPaths.PRODUCTS_FINDER;
@@ -289,22 +290,20 @@ public class ProductoServlet extends HttpServlet {
 			id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 			
 			if(id!=null) {
-				g = new Juego();
 				try {
 					g = service.findJuegoById(id);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				if(g == null) {
+			}
+			if(g == null && id!=null) {
 
-					p = new Producto();					
 					try {
 						p = service.findById(id, language);
 					} catch (Exception e) {
 						e.printStackTrace();
 						errors.add(ParameterNames.PRODUCT, ErrorCodes.FINDER_ERROR);
 					}
-				}
 			}else {
 				errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
 			}
@@ -315,7 +314,7 @@ public class ProductoServlet extends HttpServlet {
 			}else {
 				if(g!=null) {
 					SetAttribute.setResult(request, g);
-					target = ViewPaths.PRODUCT_DETAIL;
+					target = ViewPaths.GAME_DETAIL;
 				}else {
 					SetAttribute.setResult(request, p);
 					target = ViewPaths.PRODUCT_DETAIL;

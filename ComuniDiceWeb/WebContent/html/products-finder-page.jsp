@@ -15,11 +15,12 @@
 	<!-- Listado -->
 	<ul>
 		<c:forEach items="${results}" var="r">
-			<c:url var="urlDetail" scope="page" value="result">
+			<c:url var="urlDetail" scope="page" value="producto">
 				<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.DETAIL_VIEW%>"/>
-				<c:param name="<%=ParameterNames.ID %>" value="${r.id}"/>
+				<c:param name="<%=ParameterNames.ID %>" value="${r.idProducto}"/>
 			</c:url>			
-			<li><a href="${urlDetail}">${r.nombre}</a></li>			
+			<li><a href="${urlDetail}">${r.nombre}</a></li>	
+			<li>${r.descripcion}</li>		
 		</c:forEach>
 	</ul>
 
