@@ -15,12 +15,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.comunidice.web.model.Errors;
+import com.comunidice.web.model.PagoServiceMock;
 import com.comunidice.web.model.ShoppingCart;
 import com.comunidice.web.model.ShoppingCartLine;
 import com.comunidice.web.util.Actions;
 import com.comunidice.web.util.AttributeNames;
 import com.comunidice.web.util.ConfigurationManager;
 import com.comunidice.web.util.ConfigurationParameterNames;
+import com.comunidice.web.util.ControllerPaths;
 import com.comunidice.web.util.ErrorCodes;
 import com.comunidice.web.util.ParameterNames;
 import com.comunidice.web.util.ParameterUtils;
@@ -125,10 +127,14 @@ public class ProductoServlet extends HttpServlet {
 		Boolean favourite = null;
 		Integer quantity = null;
 		Double total = null;
+		Double shippingCost = null;
+		Integer index = null;
+		String cardNumber = null;
+		Date expireDate = null;
 		
 		String url = null;
 		String target = null;
-		Boolean redirect = null;
+		Boolean redirect = false;
 		Boolean send = true;
 		
 		Boolean game = null;
@@ -236,10 +242,10 @@ public class ProductoServlet extends HttpServlet {
 				target = ViewPaths.PRODUCTS_FINDER;
 				redirect = false;
 				if(game) {
-					SetAttribute.setResult(request, gs);
+					SetAttribute.setResults(request, gs);
 
 				}else {
-					SetAttribute.setResult(request, ps);
+					SetAttribute.setResults(request, ps);
 				}
 				firstPagedPage = Math.max(1, page-pagingPageCount);
 				lastPagedPage = Math.min(totalPages, page+pagingPageCount);
@@ -286,6 +292,8 @@ public class ProductoServlet extends HttpServlet {
 		}
 		
 		else if(Actions.DETAIL_VIEW.equalsIgnoreCase(action)) {
+			
+			language = SessionManager.get(request, WebConstants.USER_LOCALE).toString();
 			
 			id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 			
@@ -417,24 +425,19 @@ public class ProductoServlet extends HttpServlet {
 		
 		else if(Actions.FAVOURITE.equalsIgnoreCase(action)) {
 			
-			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			
-			id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
-			userId = ValidationUtils.parseIntParameter(request, ParameterNames.USER_ID);
-			rate = ValidationUtils.parseDoubleParameter(request, ParameterNames.RATE);
-			favourite = ValidationUtils.parseBooleanParameter(request, ParameterNames.FAVOURITE);
-			
+			u = (Usuario) SessionManager.get(request, AttributeNames.USER);			
+						
 			if(u!=null) {
 				f = new Favorito();
-				
+				userId = u.getIdUsuario();
+				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
+				rate = ValidationUtils.parseDoubleParameter(request, ParameterNames.RATE);
+				favourite = ValidationUtils.parseBooleanParameter(request, ParameterNames.FAVOURITE);
+
 				if(rate!=null) {
 					f.setValoracion(rate);
 				}
-				if(u.getIdUsuario().equals(userId)) {
-					f.setUsuario(userId);
-				}else {
-					errors.add(ParameterNames.ID, ErrorCodes.IDENTITY_ERROR);
-				}
+				f.setUsuario(userId);
 				f.setFavorito(favourite);
 				f.setProducto(id);
 				if(rate==null && favourite==false) {
@@ -462,6 +465,10 @@ public class ProductoServlet extends HttpServlet {
 						}
 					}
 				}
+				send = false;
+			} else {
+				target = ViewPaths.LOGIN;
+				redirect = true;
 			}
 		}
 		
@@ -482,69 +489,125 @@ public class ProductoServlet extends HttpServlet {
 					try {
 						g = service.findJuegoById(id);
 					} catch(Exception e) {
-						errors.add(ParameterNames.GAME, ErrorCodes.FINDER_ERROR);
 						 
 					}
 					if(g == null) {
-						language = (String) SessionManager.get(request, AttributeNames.LANGUAGE);
+						language = SessionManager.get(request, WebConstants.USER_LOCALE).toString();
 						try {
 							p = service.findById(id, language);
 						}catch(Exception e) {
 							errors.add(ParameterNames.PRODUCT, ErrorCodes.FINDER_ERROR);
 						}
 						if(p!=null && !errors.hasErrors()) {
-							int index = cartLines.indexOf(p);
+							
+							total = cart.getTotal();
+							shippingCost = cart.getShippingCosts();
+							
+							if(cartLines!=null) {
+								ShoppingCartLine scl = new ShoppingCartLine();
+								scl.setProduct(p);
+								index = cartLines.indexOf(scl);
+								if(index!=-1) {
+									cartLine = cartLines.get(index);
+									quantity = cartLine.getQuantity();
+									quantity++;
+									cartLine.setQuantity(quantity);
+									if(total!=null) {
+										total = total+p.getPrecio();
+									} else {
+										total = p.getPrecio()*quantity;
+									}
+									if(shippingCost==null) {
+										shippingCost = quantity*0.5;
+									}
+									else {
+										shippingCost = shippingCost+0.5;
+									}
+								}
+							} 
+							if(index == null || index == -1){
+								if(cartLines == null) {
+									cartLines = new ArrayList<ShoppingCartLine>();
+								}
+								quantity = 1;
+								cartLine = new ShoppingCartLine();
+								cartLine.setProduct(p);
+								cartLine.setQuantity(quantity);
+								cartLine.setGame(false);
+								cartLines.add(cartLine);
+								if(total!=null) {
+									total = total+p.getPrecio()*quantity;
+								} else {
+									total = p.getPrecio()*quantity;
+								}
+								if(shippingCost==null) {
+									shippingCost = quantity*0.5;
+								}
+								else {
+									shippingCost = shippingCost+0.5;
+								}
+							}
+						}
+					} if (g!=null && !errors.hasErrors()){
+						total = cart.getTotal();
+						shippingCost = cart.getShippingCosts();
+						
+						if(cartLines!=null) {
+							ShoppingCartLine scl = new ShoppingCartLine();
+							scl.setProduct(g);
+							index = cartLines.indexOf(scl);
 							if(index!=-1) {
 								cartLine = cartLines.get(index);
 								quantity = cartLine.getQuantity();
 								quantity++;
 								cartLine.setQuantity(quantity);
-								cartLines.add(index, cartLine);
-							} else {
-								cartLine = new ShoppingCartLine();
-								cartLine.setProduct(p);
-								cartLine.setQuantity(1);
-								cartLine.setGame(false);
-								cartLines.add(cartLine);
+								if(total!=null) {
+									total = total+g.getPrecio();
+								} else {
+									total = g.getPrecio()*quantity;
+								}
+								if(shippingCost==null) {
+									shippingCost = quantity*0.5;
+								}
+								else {
+									shippingCost = shippingCost+0.5;
+								}
 							}
-							total = cart.getTotal();
-							if(total!=null) {
-								total = total+p.getPrecio()*quantity;
-							} else {
-								total = p.getPrecio()*quantity;
+						} 
+						if(index == null || index == -1){
+							if(cartLines == null) {
+								cartLines = new ArrayList<ShoppingCartLine>();
 							}
-						}
-					} if (g!=null && !errors.hasErrors()){
-						int index = cartLines.indexOf(g);
-						if(index!=-1) {
-							cartLine = cartLines.get(index);
-							quantity = cartLine.getQuantity();
-							quantity++;
-							cartLine.setQuantity(quantity);
-							cartLines.add(index, cartLine);
-						} else {
+							quantity = 1;
 							cartLine = new ShoppingCartLine();
 							cartLine.setProduct(g);
-							cartLine.setQuantity(1);
-							cartLine.setGame(true);
+							cartLine.setQuantity(quantity);
+							cartLine.setGame(false);
 							cartLines.add(cartLine);
-						}
-						total = cart.getTotal();
-						if(total!=null) {
-							total = total+g.getPrecio()*quantity;
-						} else {
-							total = g.getPrecio()*quantity;
+							if(total!=null) {
+								total = total+g.getPrecio()*quantity;
+							} else {
+								total = g.getPrecio()*quantity;
+							}
+							if(shippingCost==null) {
+								shippingCost = quantity*0.5;
+							}
+							else {
+								shippingCost = shippingCost+0.5;
+							}
 						}
 					}
 					if(!errors.hasErrors()) {
 						cart.setLine(cartLines);
+						cart.setShippingCosts(shippingCost);
+						logger.debug(shippingCost + " " +total);
+						total =  total+0.5;
 						cart.setTotal(total);
-						cart.setShippingCosts(cartLines.size()*0.5);
 						SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
 					}
 				} else {
 					errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
-				}
+				} send = false;
 			} else {
 				target = ViewPaths.LOGIN;
 				redirect = true;
@@ -561,44 +624,52 @@ public class ProductoServlet extends HttpServlet {
 				cartLines = cart.getLine();
 				 
 				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
-				if(id!=null) {
+				if(id!=null && cartLines!=null) {
 					try {
 						g = service.findJuegoById(id);
 					} catch(Exception e) {
-						errors.add(ParameterNames.GAME, ErrorCodes.FINDER_ERROR);	 
+						 
 					}
 					if(g == null) {
-						language = (String) SessionManager.get(request, AttributeNames.LANGUAGE);
+						language = SessionManager.get(request, WebConstants.USER_LOCALE).toString();
 						try {
 							p = service.findById(id, language);
 						}catch(Exception e) {
 							errors.add(ParameterNames.PRODUCT, ErrorCodes.FINDER_ERROR);
 						}
 						if(p!=null && !errors.hasErrors()) {
-							int index = cartLines.indexOf(p);
+							ShoppingCartLine scl = new ShoppingCartLine();
+							scl.setProduct(p);
+							index = cartLines.indexOf(scl);
 							if(index!=-1) {
-								cartLines.remove(index);
 								total = cart.getTotal();
+								shippingCost = cart.getShippingCosts();
 								p = (Producto) cartLines.get(index).getProduct();
 								quantity = cartLines.get(index).getQuantity();
 								total = total-p.getPrecio()*quantity;
+								shippingCost = shippingCost-quantity*0.5;
+								cartLines.remove(scl);
 							}
 						}
 					} if(g!=null && !errors.hasErrors()) {
-						int index = cartLines.indexOf(g);
+						ShoppingCartLine scl = new ShoppingCartLine();
+						scl.setProduct(g);
+						index = cartLines.indexOf(scl);
 						if(index!=-1) {
-							cartLines.remove(index);
 							total = cart.getTotal();
+							shippingCost = cart.getShippingCosts();
 							g = (Juego) cartLines.get(index).getProduct();
 							quantity = cartLines.get(index).getQuantity();
-							total = total-p.getPrecio()*quantity;
+							total = total-g.getPrecio()*quantity;
+							shippingCost = shippingCost-quantity*0.5;
+							cartLines.remove(index);
 						}
 					}
 					
 					if(!errors.hasErrors()) {
-						cart.setLine(cartLines);
 						cart.setTotal(total);
 						cart.setShippingCosts(cartLines.size()*0.5);
+						cart.setLine(cartLines);
 						SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
 					}
 				} else {
@@ -608,6 +679,7 @@ public class ProductoServlet extends HttpServlet {
 				target = ViewPaths.LOGIN;
 				redirect = true;
 			}
+			send = false;
 		}
 		
 		else if(Actions.CLEAR_CART.equalsIgnoreCase(action)) {
@@ -618,49 +690,45 @@ public class ProductoServlet extends HttpServlet {
 				cart = new ShoppingCart();
 				SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
 			}
+			send = false;
 		}
 		
 		else if(Actions.MODIFY_QUANTITY.equalsIgnoreCase(action)) {
 			
 			u = (Usuario)SessionManager.get(request, AttributeNames.USER);
-			
+			send = false;
 			if(u!=null) {
 				
 				cart = (ShoppingCart) SessionManager.get(request, AttributeNames.SHOPPING_CART);
 
 				cartLines = cart.getLine();
 				
-				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
-				if(id!=null) {
+				index = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
+				if(index!=null) {
 					quantity = ValidationUtils.parseIntParameter(request, ParameterNames.QUANTITY);
 					if(quantity!=null) {
-						try {
-							g = service.findJuegoById(id);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						if(g==null) {
-							language = (String) SessionManager.get(request, AttributeNames.LANGUAGE);
-							try {
-								p = service.findById(id, language);
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-							if(p!=null && !errors.hasErrors()) {
-								int index = cartLines.indexOf(p);
-								if(index!=-1) {
-									cartLines.get(index).setQuantity(quantity);
-								}
-							}
+						if(quantity!=0) {
+							cartLines.get(index).setQuantity(quantity);
 						} else {
-							int index = cartLines.indexOf(g);
-							if(index!=-1) {
-								cartLines.get(index).setQuantity(quantity);
-							}
+							target = ControllerPaths.NO_CONTEXT_PRODUCTO.concat("?").concat(ParameterNames.ACTION)
+									.concat("=").concat(Actions.REMOVE_FROM_CART);
+							send = true;
 						}
-						SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
 					}
+				SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
 				}
+			}
+		}
+		
+		else if(Actions.PRE_BUY.equalsIgnoreCase(action)) {
+			
+			cardNumber = ValidationUtils.parameterIsEmpty(request, ParameterNames.CARD_NUMBER);
+			expireDate = ValidationUtils.dateFormat(ValidationUtils.getParameter(request, ParameterNames.EXPIRE_DATE));
+			
+			if(PagoServiceMock.check(cardNumber, expireDate)) {
+				target = ControllerPaths.NO_CONTEXT_PRODUCTO.concat("?").concat(ParameterNames.ACTION)
+							.concat("=").concat(Actions.BUY);
+				redirect = true;
 			}
 		}
 		
@@ -673,7 +741,7 @@ public class ProductoServlet extends HttpServlet {
 				if(cart!=null) {
 					cartLines = cart.getLine();
 					for(ShoppingCartLine line:cartLines) {
-						line.getGame();
+						game = line.getGame();
 						if(game) {
 							g = (Juego) line.getProduct();
 							id = g.getIdProducto();
@@ -681,14 +749,22 @@ public class ProductoServlet extends HttpServlet {
 						} else {
 							p = (Producto) line.getProduct();
 							id = p.getIdProducto();
-							total = g.getPrecio();
+							total = p.getPrecio();
 						}
+						buyLine = new LineaCompra();
 						quantity = line.getQuantity();
 						buyLine.setCantidad(quantity);
 						buyLine.setIdProducto(id);
 						buyLine.setPrecioUnitario(total);
+						buyLine.setPrecioTotal(total);
+						buyLine.setDescuento(0.0);
+						buyLines = new ArrayList<LineaCompra>();
 						buyLines.add(buyLine);
 					}
+					logger.debug(cart.getTotal());
+					logger.debug(cart.getShippingCosts());
+					logger.debug(cart.getTotal()-cart.getShippingCosts());
+					buy = new Compra();
 					buy.setIdUsuario(u.getIdUsuario());
 					buy.setGastosEnvio(cart.getShippingCosts());
 					buy.setSubtotal(cart.getTotal()-cart.getShippingCosts());

@@ -5,7 +5,7 @@
 <p>
 	<c:if test="${not empty total}">
 		<fmt:message key="encontrados" bundle="${messages}">
-			<fmt:param value="${total}"></fmt:param>
+			<fmt:param value="${total}"/>
 		</fmt:message>		
 	</c:if>
 </p>
@@ -30,7 +30,7 @@
 	<!-- A la primera pagina -->
 	<c:if test="${page > 1}">
 		<a href="${url}&amp;page=1">
-			<fmt:message key="Primera" bundle="${messages}"/>
+			<fmt:message key="primera" bundle="${messages}"/>
 		</a>
 		&nbsp;&nbsp;
 	</c:if>
@@ -38,7 +38,7 @@
 	<!-- A la anterior pagina -->
 	<c:if test="${page > 1}">
 		<a href="${url}&page=${page - 1}">
-			<fmt:message key="Anterior" bundle="${messages}"/>
+			<fmt:message key="anterior" bundle="${messages}"/>
 		</a>
 		&nbsp;&nbsp;
 	</c:if>
@@ -62,12 +62,12 @@
 	<c:if test="${page < totalPages}">
 		&nbsp;&nbsp;		
 		<a href="${url}&page=${page + 1}">
-			<fmt:message key="Siguiente" bundle="${messages}"/>
+			<fmt:message key="siguiente" bundle="${messages}"/>
 		</a>			
 	</c:if>	
 	<!-- A la ultima página -->
 	<c:if test="${page != totalPages}">
-		&nbsp;&nbsp;<a href="${url}&page=${totalPages}"><fmt:message key="Ultima" bundle="${messages}"/></a>
+		&nbsp;&nbsp;<a href="${url}&page=${totalPages}"><fmt:message key="ultima" bundle="${messages}"/></a>
 	</c:if>		
 
 	</center></p>

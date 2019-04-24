@@ -18,6 +18,7 @@ public interface Actions {
 	public static final String PRE_SEND_MESSAGE = "preSendMessage";
 	public static final String SEND_MESSAGE = "sendMessage";
 	public static final String REMOVE_MESSAGE = "removeMessage";
+	public static final String CHANGE_LOCALE = "changeLocale";
 	
 	public static final String SEARCH_PRODUCTS = "searchProducts";
 	public static final String DEFAULT_SEARCH = "defaultSearch";
@@ -28,5 +29,6 @@ public interface Actions {
 	public static final String REMOVE_FROM_CART = "removeFromCart";
 	public static final String CLEAR_CART = "clearCart";
 	public static final String MODIFY_QUANTITY = "modifyQuantity";
+	public static final String PRE_BUY = "preBuy";
 	public static final String BUY = "buy";
 }

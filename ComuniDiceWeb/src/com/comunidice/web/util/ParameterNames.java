@@ -59,4 +59,7 @@ public interface ParameterNames {
 	public static final String SEARCH_TYPE = "searchType";
 	public static final String SEARCH_USER = "searchUser";
 	public static final String SEARCH_PRODUCT = "searchProduct";
+	public static final String CARD_NUMBER = "cardNumber";
+	public static final String EXPIRE_DATE = "expireDate";
+	public static final String INDEX = "index";
 }

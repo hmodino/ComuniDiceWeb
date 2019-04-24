@@ -1,12 +1,12 @@
 <%@page import="java.util.*" %>
 <%@include file="/html/common/header.jsp"%>
 	<c:if test="${not empty results}">
-			<c:url var="urlDetailView" scope="page" value="usuario">
-				<c:param name="action" value="<%=Actions.DETAIL_VIEW%>"/>
+			<c:url var="urlDetailView" scope="page" value="<%=ControllerPaths.NO_CONTEXT_USUARIO %>">
+				<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.DETAIL_VIEW%>"/>
 				<c:param name="<%=ParameterNames.ID%>" value="${results.idUsuario}"/>
 			</c:url>
-			<c:url var="urlAdd" scope="page" value="usuario">
-				<c:param name="action" value="<%=Actions.ADD_FRIEND%>"/>
+			<c:url var="urlAdd" scope="page" value="<%=ControllerPaths.NO_CONTEXT_USUARIO %>">
+				<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.ADD_FRIEND%>"/>
 				<c:param name="<%=ParameterNames.ID%>" value="${results.idUsuario}"/>
 			</c:url>
 			<a href="${urlDetailView}">${results.nombreUsuario}</a>

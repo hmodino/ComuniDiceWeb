@@ -33,4 +33,24 @@ public class ShoppingCartLine<T> {
 	public void setGame(Boolean game) {
 		this.game = game;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		Boolean b = true;
+		
+		if(o==null) {
+			b=false;
+		}
+		if(!(o instanceof ShoppingCartLine)) {
+			b=false;
+		}
+		if(this.getProduct()== null) {
+			b=false;
+		}
+		ShoppingCartLine scl = (ShoppingCartLine) o;
+		if(!this.getProduct().equals(scl.getProduct())) {
+			b=false;
+		}
+		return b;
+	}
 }

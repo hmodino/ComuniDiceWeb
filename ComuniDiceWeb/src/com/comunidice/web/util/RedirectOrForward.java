@@ -21,6 +21,9 @@ public class RedirectOrForward {
 			if(!redirect) {
 				request.getRequestDispatcher(target).forward(request, response);
 			}
+		} else {
+			target = request.getHeader("referer");
+			response.sendRedirect(target);
 		}
 	}
 }

@@ -1,63 +1,45 @@
 <%@include file="/html/common/header.jsp"%>
 <div id="signup">
-	<h3>Registro</h3>
+	<h3><fmt:message key="registro" bundle="${messages}"/></h3>
 	<form action="<%=ControllerPaths.USUARIO%>" method="post">
 	
-		<h4>Datos Personales</h4>
+		<h4><fmt:message key="datosPersonales" bundle="${messages}"/></h4>
 		
 			<input type="hidden" name="<%=ParameterNames.ACTION%>" value="<%=Actions.SIGN_UP%>"/>
 			
-			<input type="text" name="<%=ParameterNames.NAME%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.NAME)%>" placeholder="Nombre*"/>
+			<input type="text" name="<%=ParameterNames.NAME%>" placeholder="<fmt:message key="nombre" bundle="${messages}"/>"/>
 				
-			<input type="text" name="<%=ParameterNames.SURNAME%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.SURNAME)%>" placeholder="Apellido 1*"/>
+			<input type="text" name="<%=ParameterNames.SURNAME%>" placeholder="<fmt:message key="apellido" bundle="${messages}"/>"/>
 				
-			<input type="text" name="<%=ParameterNames.SURNAME2%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.SURNAME2)%>" placeholder="Apellido 2">
+			<input type="text" name="<%=ParameterNames.SURNAME2%>" placeholder="<fmt:message key="apellido" bundle="${messages}"/>">
 				
-			<input type="text" name="<%=ParameterNames.USER_NAME%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.USER_NAME)%>" placeholder="Nombre de Usuario*">
+			<input type="text" name="<%=ParameterNames.USER_NAME%>" placeholder="<fmt:message key="nombreUsuario" bundle="${messages}"/>">
 				
-			<input type="email" name="<%=ParameterNames.EMAIL%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.EMAIL)%>" placeholder="Email*">
+			<input type="password" name="<%=ParameterNames.PASSWORD%>" placeholder="<fmt:message key="contrasena" bundle="${messages}"/>">
 				
-			<input type="password" name="<%=ParameterNames.PASSWORD%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.PASSWORD)%>" placeholder="Contraseña*">
+			<input type="text" name="<%=ParameterNames.DESCRIPTION%>" placeholder="<fmt:message key="descripcion" bundle="${messages}"/>">
 				
-			<input type="text" name="<%=ParameterNames.DESCRIPTION%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.DESCRIPTION)%>" placeholder="Descripción">
-				
-			<input type="text" name="<%=ParameterNames.PHONE%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.PHONE)%>" placeholder="Teléfono">
+			<input type="text" name="<%=ParameterNames.PHONE%>" placeholder="<fmt:message key="telefono" bundle="${messages}"/>">
 			
-			<h4>Dirección</h4>
+			<h4><fmt:message key="direccion" bundle="${messages}"/></h4>
 			
-			<input type="text" name="<%=ParameterNames.MUNICIPALITY%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.MUNICIPALITY)%>" placeholder="Municipio**">
+			<input type="text" name="<%=ParameterNames.MUNICIPALITY%>" placeholder="<fmt:message key="municipio" bundle="${messages}"/>">
 				
-			<input type="text" name="<%=ParameterNames.LOCALITY%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.LOCALITY)%>" placeholder="Localidad">
+			<input type="text" name="<%=ParameterNames.LOCALITY%>" placeholder="<fmt:message key="localidad" bundle="${messages}"/>">
 				
-			<input type=text name="<%=ParameterNames.CP%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.CP)%>" placeholder="Código Postal**">
+			<input type=text name="<%=ParameterNames.CP%>" placeholder="<fmt:message key="codigoPostal" bundle="${messages}"/>">
 				
-			<input type="text" name="<%=ParameterNames.STREET%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.STREET)%>" placeholder="Calle">
+			<input type="text" name="<%=ParameterNames.STREET%>" placeholder="<fmt:message key="calle" bundle="${messages}"/>">
 				
-			<input type="text" name="<%=ParameterNames.PORTAL_NUMBER%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.PORTAL_NUMBER)%>" placeholder="Número">
+			<input type="text" name="<%=ParameterNames.PORTAL_NUMBER%>" placeholder="<fmt:message key="numero" bundle="${messages}"/>">
 				
-			<input type="text" name="<%=ParameterNames.PORTAL%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.PORTAL)%>" placeholder="Portal">
+			<input type="text" name="<%=ParameterNames.PORTAL%>" placeholder="<fmt:message key="portal" bundle="${messages}"/>">
 				
-			<input type="text" name="<%=ParameterNames.FLOOR%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.FLOOR)%>" placeholder="Piso">
+			<input type="text" name="<%=ParameterNames.FLOOR%>" placeholder="<fmt:message key="piso" bundle="${messages}"/>">
 				
-			<input type="text" name="<%=ParameterNames.DIRECTION_OTHERS%>" 
-				value="<%=ValidationUtils.getParameter(request, ParameterNames.DIRECTION_OTHERS)%>" placeholder="Otros">
+			<input type="text" name="<%=ParameterNames.DIRECTION_OTHERS%>" placeholder="<fmt:message key="otros" bundle="${messages}"/>">
 							
-			<input type="submit" value="Registro" />
+			<input type="submit" value="<fmt:message key="registro" bundle="${messages}"/>" />
 		</form>
 	
 </div>

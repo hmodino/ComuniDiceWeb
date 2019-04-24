@@ -3,6 +3,7 @@ package com.comunidice.web.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,7 +18,9 @@ import com.comunidice.web.model.Errors;
 import com.comunidice.web.model.ShoppingCart;
 import com.comunidice.web.util.Actions;
 import com.comunidice.web.util.AttributeNames;
+import com.comunidice.web.util.CookieManager;
 import com.comunidice.web.util.ErrorCodes;
+import com.comunidice.web.util.LocaleManager;
 import com.comunidice.web.util.ParameterNames;
 import com.comunidice.web.util.RedirectOrForward;
 import com.comunidice.web.util.SessionAttributeNames;
@@ -25,15 +28,18 @@ import com.comunidice.web.util.SessionManager;
 import com.comunidice.web.util.SetAttribute;
 import com.comunidice.web.util.ValidationUtils;
 import com.comunidice.web.util.ViewPaths;
+import com.comunidice.web.util.WebConstants;
 import com.rollanddice.comunidice.model.Direccion;
 import com.rollanddice.comunidice.model.Mensaje;
 import com.rollanddice.comunidice.model.Pais;
 import com.rollanddice.comunidice.model.Region;
 import com.rollanddice.comunidice.model.Usuario;
 import com.rollanddice.comunidice.service.impl.AmigoServiceImpl;
+import com.rollanddice.comunidice.service.impl.DireccionServiceImpl;
 import com.rollanddice.comunidice.service.impl.MensajeServiceImpl;
 import com.rollanddice.comunidice.service.impl.UsuarioServiceImpl;
 import com.rollanddice.comunidice.service.spi.AmigoService;
+import com.rollanddice.comunidice.service.spi.DireccionService;
 import com.rollanddice.comunidice.service.spi.MensajeService;
 import com.rollanddice.comunidice.service.spi.UsuarioService;
 
@@ -45,13 +51,14 @@ public class UsuarioServlet extends HttpServlet {
 	private UsuarioService service = null;
 	private AmigoService amigoService = null;
 	private MensajeService mensajeService = null;
-	
+	private DireccionService direccionService = null;
 	
     public UsuarioServlet() {
     	super();
     	service = new UsuarioServiceImpl();
     	amigoService = new AmigoServiceImpl();
     	mensajeService = new MensajeServiceImpl();
+    	direccionService = new DireccionServiceImpl();
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -64,10 +71,12 @@ public class UsuarioServlet extends HttpServlet {
 		Pais p = null;
 		Mensaje m = null;
 		ShoppingCart cart = null;
+		Locale locale = null;
 
 		List<Mensaje> messages = null;
 		List<Usuario> friends = null;
-
+		List<Locale> locales = null;
+		
 		String action = ValidationUtils.parameterIsEmpty(request, ParameterNames.ACTION);
 		
 		String target = null;
@@ -91,8 +100,10 @@ public class UsuarioServlet extends HttpServlet {
 		Integer id = null;
 		String messageType = null;
 		String messageContent = null;
-
+		String language = null;
+		
 		Boolean redirect = false;
+		Boolean send = true;
 		
 		if (Actions.LOGIN.equalsIgnoreCase(action)) {
 			
@@ -108,6 +119,7 @@ public class UsuarioServlet extends HttpServlet {
 			if(!errors.hasErrors()) {
 				try {
 					u = service.logIn(email, password);
+					logger.debug(u.getIdUsuario());
 				} catch (Exception ex) {
 					errors.add(ParameterNames.USER, ErrorCodes.LOGIN_ERROR);
 					ex.printStackTrace();
@@ -380,17 +392,32 @@ public class UsuarioServlet extends HttpServlet {
 				redirect = false;
 				SetAttribute.setErrors(request, errors);
 			}else {
-				try {
-					service.editar(u, d);	
-					SetAttribute.setResult(request, u);
-					SessionManager.set(request, AttributeNames.USER, u);
-					target = ViewPaths.USER_PROFILE;
-					redirect = false;
-				} catch (Exception e) {
-					errors.add(ParameterNames.USER, ErrorCodes.UPDATE_ERROR);
-					target = ViewPaths.USER_PROFILE;
-					redirect = false;
-					SetAttribute.setErrors(request, errors);
+				if(u!=null && d!=null) {
+					try {
+						service.editar(u, d);	
+						SetAttribute.setResult(request, u);
+						SessionManager.set(request, AttributeNames.USER, u);
+						target = ViewPaths.USER_PROFILE;
+						redirect = false;
+					} catch (Exception e) {
+						errors.add(ParameterNames.USER, ErrorCodes.UPDATE_ERROR);
+						target = ViewPaths.USER_PROFILE;
+						redirect = false;
+						SetAttribute.setErrors(request, errors);
+					}
+				} if(u==null && d!=null) {
+					try {
+						direccionService.update(d);	
+						SetAttribute.setResult(request, u);
+						SessionManager.set(request, AttributeNames.USER, u);
+						target = ViewPaths.USER_PROFILE;
+						redirect = false;
+					} catch (Exception e) {
+						errors.add(ParameterNames.USER, ErrorCodes.UPDATE_ERROR);
+						target = ViewPaths.USER_PROFILE;
+						redirect = false;
+						SetAttribute.setErrors(request, errors);
+					}
 				}
 			}
 		}
@@ -641,7 +668,6 @@ public class UsuarioServlet extends HttpServlet {
 			
 			if(u != null) {
 				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
-				name = ValidationUtils.parameterIsEmpty(request, ParameterNames.NAME);
 				if(id==null) {
 					friends = new ArrayList<Usuario>();
 						try {
@@ -756,7 +782,21 @@ public class UsuarioServlet extends HttpServlet {
 				SetAttribute.setUser(request, u);
 			}
 		}
-		RedirectOrForward.send(request, response, redirect, target, true);
+		
+		else if(Actions.CHANGE_LOCALE.equalsIgnoreCase(action)) {
+
+			language = ValidationUtils.parameterIsEmpty(request, ParameterNames.LANGUAGE);
+			locales = LocaleManager.getMatchedLocales(language);
+			if(locales.size()>0) {
+				locale = locales.get(0);
+				SessionManager.set(request, WebConstants.USER_LOCALE, locale);
+				CookieManager.addCookie(response, WebConstants.USER_LOCALE, locale.toString(), "/", 365*24*60*60);
+			}
+			send = false;
+			redirect = true;
+			
+		}
+		RedirectOrForward.send(request, response, redirect, target, send);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 

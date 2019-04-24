@@ -85,6 +85,32 @@ public class ValidationUtils {
 		}
 	}
 	
+	public static final Date dateFormat(Date d) {
+		
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+		Date date = null;
+		try {
+			date = format.parse(format.format(d));
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return date;
+	}
+	
+	public static final Date dateFormat(String s) {
+		
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Date date = null;
+		try {
+			date = format.parse(s);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return date;
+	}
+	
 	public static final Double parseDoubleParameter(HttpServletRequest request, String name) {
 		
 		String s = getParameter(request, name);

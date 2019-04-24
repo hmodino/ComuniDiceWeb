@@ -16,5 +16,7 @@ public interface ViewPaths {
 	public static final String PRODUCTS_FINDER = "/html/products-finder-page.jsp";
 	public static final String GAME_DETAIL = "/html/juego-detalle-page.jsp";
 	public static final String PRODUCT_DETAIL = "/html/producto-detalle-page.jsp";
+	public static final String CART = "/html/carrito-page.jsp";
+	public static final String BUY = "/html/compra-page.jsp";
 	
 }

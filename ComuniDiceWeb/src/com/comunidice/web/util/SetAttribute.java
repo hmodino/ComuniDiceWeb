@@ -22,7 +22,7 @@ public class SetAttribute {
 	}
 	
 	public static final void setResult(HttpServletRequest request, Object o) {
-		request.setAttribute(AttributeNames.RESULTS, o);
+		request.setAttribute(AttributeNames.RESULT, o);
 	}
 	
 	public static final void setOthers(HttpServletRequest request, String s, Object o) {
