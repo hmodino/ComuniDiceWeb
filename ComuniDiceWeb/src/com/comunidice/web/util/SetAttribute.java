@@ -25,8 +25,11 @@ public class SetAttribute {
 		request.setAttribute(AttributeNames.RESULT, o);
 	}
 	
+	public static final void setCatgories(HttpServletRequest request, Object o) {
+		request.setAttribute(AttributeNames.CATEGORIES, o);
+	}
+	
 	public static final void setOthers(HttpServletRequest request, String s, Object o) {
 		request.setAttribute(s, o);
 	}
-
 }

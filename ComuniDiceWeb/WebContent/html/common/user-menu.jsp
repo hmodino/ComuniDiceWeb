@@ -21,6 +21,8 @@
 					<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.FIND_MESSAGES %>">
 						<fmt:message key="mensajes" bundle="${messages}"/></a>
 					<a href="/ComuniDiceWeb<%=ViewPaths.CART%>"><fmt:message key="carrito" bundle="${messages}"/></a>
+					<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.FAVOURITE_DETAILS%>">
+						<fmt:message key="favoritos" bundle="${messages}"/></a>
 				</div>		
 		</c:otherwise>
 	</c:choose>

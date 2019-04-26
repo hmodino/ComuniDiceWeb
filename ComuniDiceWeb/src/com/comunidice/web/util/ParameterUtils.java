@@ -1,5 +1,7 @@
 package com.comunidice.web.util;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import com.rollanddice.comunidice.model.Criteria;
@@ -13,8 +15,8 @@ public class ParameterUtils {
 		
 		criteria = new StringBuilder();
 		
-		criteria.append(ControllerPaths.SEARCH).append("?").append(ParameterNames.SEARCH_TYPE).append("=")
-			.append(ParameterNames.SEARCH_PRODUCT).append("&").append(ParameterNames.DEFAULT).append("=")
+		criteria.append(ControllerPaths.PRODUCTO).append("?").append(ParameterNames.ACTION).append("=")
+			.append(Actions.SEARCH_PRODUCTS).append("&").append(ParameterNames.DEFAULT).append("=")
 			.append(defaultSearch.toString());
 	
 		if(c.getIdCategoria()!=null) {
@@ -90,6 +92,24 @@ public class ParameterUtils {
 		
 		s = criteria.toString();
 		return s;
+	}
+	
+	public static String URLBuilder (String context, Map<String, String> params) {
+		Integer cont = 1;
+		StringBuilder url = new StringBuilder();
+		url.append(context);
+		for(String mapKey: params.keySet()) {
+			if(cont == 1) {
+				url.append("?");
+			}
+			url.append(ValidationUtils.isEmpty(mapKey)).append("=")
+				.append(ValidationUtils.isEmpty(params.get(mapKey)));
+			if(cont != params.size()) {
+				url.append("&");
+			}
+			cont++;
+		}
+		return url.toString();
 	}
 
 }

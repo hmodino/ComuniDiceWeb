@@ -22,8 +22,16 @@
 			<div id="comentarios">
 			<c:forEach items="${result.comentarios}" var="c">
 				<div id="comentario">
+					<p>${c.nombreUsuario}</p>
 					<p>${c.fecha}</p>
 					<p>${c.contenido}</p>
+					<c:if test="${c.usuario eq user.idUsuario}">
+						<c:url var="deleteComment" scope="page" value="producto">
+							<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.DELETE_COMMENT%>"/>
+							<c:param name="<%=ParameterNames.ID %>" value="${c.idComentario}"/>
+						</c:url>
+						<a href="${deleteComment}"><fmt:message key="eliminar" bundle="${messages}"/></a>
+					</c:if>
 				</div>
 			</c:forEach>
 			</div>

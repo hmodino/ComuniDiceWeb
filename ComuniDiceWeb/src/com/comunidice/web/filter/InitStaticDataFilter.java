@@ -1,6 +1,7 @@
 package com.comunidice.web.filter;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -9,37 +10,38 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
-import com.comunidice.web.util.SessionManager;
+import com.comunidice.web.util.SetAttribute;
+import com.rollanddice.comunidice.model.Categoria;
+import com.rollanddice.comunidice.service.impl.CategoriaServiceImpl;
+import com.rollanddice.comunidice.service.spi.CategoriaService;
 
-/**
- * Servlet Filter implementation class InitFilter
- */
-public class InitFilter implements Filter {
+public class InitStaticDataFilter implements Filter {
 
-    public InitFilter() {
-
+	private CategoriaService service = null;
+    public InitStaticDataFilter() {
+    	service = new CategoriaServiceImpl();
     }
 
 	public void destroy() {
-
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-	
+
 		HttpServletRequest httpRequest = ((HttpServletRequest) request);
-		HttpSession session = httpRequest.getSession(false);
 		
-		if (session==null) {
-			// Inicializa la sesion
-			session = httpRequest.getSession(true);
+		List<Categoria> cs = null;
+		try {
+			cs = service.findAll();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		SetAttribute.setCatgories(httpRequest, cs);
+
 		chain.doFilter(request, response);
 	}
 
 	public void init(FilterConfig fConfig) throws ServletException {
-
 	}
 
 }

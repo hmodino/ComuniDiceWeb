@@ -14,4 +14,5 @@ public interface AttributeNames {
 	public static final String PRODUCTS = "products";
 	public static final String SHOPPING_CART = "shoppingCart";
 	public static final String LANGUAGE = "language";
+	public static final String CATEGORIES = "categories";
 }

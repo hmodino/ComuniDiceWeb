@@ -17,16 +17,39 @@
 					<fmt:message key="nombre" bundle="${messages}"/>
 			</div>
 			<div id="hiddenCriteria">
-				<fmt:message key="categoria" bundle="${messages}"/><input type="text" name="<%=ParameterNames.CATEGORY_ID %>">
+				<c:if test="${not empty categories}">
+				<fmt:message key="categoria" bundle="${messages}"/>
+					<select name="<%=ParameterNames.CATEGORY_ID%>">
+						<option></option>
+						<c:forEach items="${categories}" var="c">
+							<option value="${c.id}">${c.nombre}</option>
+						</c:forEach>
+					</select>
+				</c:if>
 				<fmt:message key="precioMin" bundle="${messages}"/><input type="text" name="<%=ParameterNames.MIN_PRICE %>">
 				<fmt:message key="precioMax" bundle="${messages}"/><input type="text" name="<%=ParameterNames.MAX_PRICE %>">
-				<fmt:message key="fechaEntradaMin" bundle="${messages}"/><input type="text" name="<%=ParameterNames.MIN_DATE %>">
-				<fmt:message key="fechaEntradaMax" bundle="${messages}"/><input type="text" name="<%=ParameterNames.MAX_DATE %>">
-				<fmt:message key="tipoVendedor" bundle="${messages}"/><input type="text" name="<%=ParameterNames.SELLER_TYPE %>">
-				<fmt:message key="publicacionMin" bundle="${messages}"/><input type="text" name="<%=ParameterNames.MIN_PUBLICATION_YEAR %>">
-				<fmt:message key="publicacionMax" bundle="${messages}"/><input type="text" name="<%=ParameterNames.MAX_PUBLICATION_YEAR %>">
-				<fmt:message key="formato" bundle="${messages}"/><input type="text" name="<%=ParameterNames.FORMAT %>">
-				<fmt:message key="tipoTapa" bundle="${messages}"/><input type="text" name="<%=ParameterNames.COVER_TYPE %>">
+				<fmt:message key="fechaEntradaMin" bundle="${messages}"/><input type="date" name="<%=ParameterNames.MIN_DATE %>">
+				<fmt:message key="fechaEntradaMax" bundle="${messages}"/><input type="date" name="<%=ParameterNames.MAX_DATE %>">
+				<fmt:message key="tipoVendedor" bundle="${messages}"/>
+				<select name="<%=ParameterNames.SELLER_TYPE %>">
+					<option></option>
+					<option value="0"><fmt:message key="comunidice" bundle="${messages}"/></option>
+					<option value="1"><fmt:message key="particular" bundle="${messages}"/></option>
+				</select>
+				<fmt:message key="publicacionMin" bundle="${messages}"/><input type="number" name="<%=ParameterNames.MIN_PUBLICATION_YEAR %>">
+				<fmt:message key="publicacionMax" bundle="${messages}"/><input type="number" name="<%=ParameterNames.MAX_PUBLICATION_YEAR %>">
+				<fmt:message key="formato" bundle="${messages}"/>
+				<select name="<%=ParameterNames.FORMAT %>">
+					<option></option>
+					<option value="0"><fmt:message key="fisico" bundle="${messages}"/></option>
+					<option value="1"><fmt:message key="pdf" bundle="${messages}"/></option>
+				</select>
+				<fmt:message key="tipoTapa" bundle="${messages}"/>
+				<select name="<%=ParameterNames.COVER_TYPE %>">
+					<option></option>
+					<option value="0"><fmt:message key="blanda" bundle="${messages}"/></option>
+					<option value="1"><fmt:message key="dura" bundle="${messages}"/></option>
+				</select>
 			</div>
 			<input type="submit" value="<fmt:message key="buscar" bundle="${messages}"/>" />
 		</form>

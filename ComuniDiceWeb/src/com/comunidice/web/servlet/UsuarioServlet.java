@@ -30,16 +30,19 @@ import com.comunidice.web.util.ValidationUtils;
 import com.comunidice.web.util.ViewPaths;
 import com.comunidice.web.util.WebConstants;
 import com.rollanddice.comunidice.model.Direccion;
+import com.rollanddice.comunidice.model.Favorito;
 import com.rollanddice.comunidice.model.Mensaje;
 import com.rollanddice.comunidice.model.Pais;
 import com.rollanddice.comunidice.model.Region;
 import com.rollanddice.comunidice.model.Usuario;
 import com.rollanddice.comunidice.service.impl.AmigoServiceImpl;
 import com.rollanddice.comunidice.service.impl.DireccionServiceImpl;
+import com.rollanddice.comunidice.service.impl.FavoritoServiceImpl;
 import com.rollanddice.comunidice.service.impl.MensajeServiceImpl;
 import com.rollanddice.comunidice.service.impl.UsuarioServiceImpl;
 import com.rollanddice.comunidice.service.spi.AmigoService;
 import com.rollanddice.comunidice.service.spi.DireccionService;
+import com.rollanddice.comunidice.service.spi.FavoritoService;
 import com.rollanddice.comunidice.service.spi.MensajeService;
 import com.rollanddice.comunidice.service.spi.UsuarioService;
 
@@ -52,6 +55,7 @@ public class UsuarioServlet extends HttpServlet {
 	private AmigoService amigoService = null;
 	private MensajeService mensajeService = null;
 	private DireccionService direccionService = null;
+	private FavoritoService favoritoService = null;
 
 	public UsuarioServlet() {
 		super();
@@ -59,6 +63,7 @@ public class UsuarioServlet extends HttpServlet {
 		amigoService = new AmigoServiceImpl();
 		mensajeService = new MensajeServiceImpl();
 		direccionService = new DireccionServiceImpl();
+		favoritoService = new FavoritoServiceImpl();
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -76,6 +81,7 @@ public class UsuarioServlet extends HttpServlet {
 		List<Mensaje> messages = null;
 		List<Usuario> friends = null;
 		List<Locale> locales = null;
+		List<Favorito> favorito = null;
 
 		String action = ValidationUtils.parameterIsEmpty(request, ParameterNames.ACTION);
 
@@ -803,6 +809,26 @@ public class UsuarioServlet extends HttpServlet {
 				} else {
 					send = false;
 				}
+		}
+		
+		else if(Actions.FAVOURITE_DETAILS.equalsIgnoreCase(action)) {
+			
+			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
+			language = SessionManager.get(request, WebConstants.USER_LOCALE).toString();
+			
+			if(u!=null) {
+				try {
+					favorito = favoritoService.findByUsuario(u.getIdUsuario(), language);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+//				errors.add(parameter, errorCode);
+			}
+			if(!errors.hasErrors()) {
+				SetAttribute.setResults(request, favorito);
+				target = ViewPaths.FAVOURITES;
+			}
 		}
 		RedirectOrForward.send(request, response, redirect, target, send);
 	}

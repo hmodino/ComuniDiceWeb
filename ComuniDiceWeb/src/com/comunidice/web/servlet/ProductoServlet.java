@@ -97,6 +97,7 @@ public class ProductoServlet extends HttpServlet {
 		List<Producto> ps = null;
 		List<ShoppingCartLine> cartLines = null;
 		List<LineaCompra> buyLines = null;
+		List<Results> results = null;
 		
 		String action = ValidationUtils.parameterIsEmpty(request, ParameterNames.ACTION);
 		
@@ -112,8 +113,8 @@ public class ProductoServlet extends HttpServlet {
 		Integer rating = null;
 		Integer sellerId = null;
 		Integer sellerType = null;
-		Date minPublicationYear = null;
-		Date maxPublicationYear = null;
+		Integer minPublicationYear = null;
+		Integer maxPublicationYear = null;
 		Integer format = null;
 		Integer coverType = null;
 		Integer page = null;
@@ -132,6 +133,7 @@ public class ProductoServlet extends HttpServlet {
 		String cardNumber = null;
 		Date expireDate = null;
 		Boolean defaultSearch = null;
+		Integer fav = null;
 		
 		String url = null;
 		String target = null;
@@ -139,14 +141,16 @@ public class ProductoServlet extends HttpServlet {
 		Boolean send = true;
 		
 		Boolean game = null;
-		Boolean exist = null;
 		
 		if(Actions.SEARCH_PRODUCTS.equalsIgnoreCase(action)) {
 		
 			c = new Criteria();
 			
 			categoryId = ValidationUtils.parseIntParameter(request, ParameterNames.CATEGORY_ID);
-			name = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_BOX);
+			name = ValidationUtils.parameterIsEmpty(request, ParameterNames.NAME);
+			if(name==null) {
+				name = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_BOX);
+			}
 			minPrice = ValidationUtils.parseDoubleParameter(request, ParameterNames.MIN_PRICE);
 			maxPrice = ValidationUtils.parseDoubleParameter(request, ParameterNames.MAX_PRICE);
 			minDate = ValidationUtils.parameterDateFormat(request, ParameterNames.MIN_DATE);
@@ -155,8 +159,10 @@ public class ProductoServlet extends HttpServlet {
 			rating = ValidationUtils.parseIntParameter(request, ParameterNames.RATING);
 			sellerId = ValidationUtils.parseIntParameter(request, ParameterNames.SELLER_ID);
 			sellerType = ValidationUtils.parseIntParameter(request, ParameterNames.SELLER_TYPE);
-			minPublicationYear = ValidationUtils.parameterDateFormat(request, ParameterNames.MIN_PUBLICATION_YEAR);
-			maxPublicationYear = ValidationUtils.parameterDateFormat(request, ParameterNames.MAX_PUBLICATION_YEAR);
+			minPublicationYear = ValidationUtils.parseIntParameter(request, ParameterNames.MIN_PUBLICATION_YEAR);
+			maxPublicationYear = ValidationUtils.parseInt(
+						ValidationUtils.dateToString(
+								ValidationUtils.parameterDateFormat(request, ParameterNames.MAX_PUBLICATION_YEAR)));
 			format = ValidationUtils.parseIntParameter(request, ParameterNames.FORMAT);
 			coverType = ValidationUtils.parseIntParameter(request, ParameterNames.COVER_TYPE);
 			
@@ -225,7 +231,6 @@ public class ProductoServlet extends HttpServlet {
 					errors.add(ParameterNames.GAME, ErrorCodes.NOT_FOUND_OBJECT);
 				}
 			}else {
-				ps = new ArrayList<Producto>();
 				products = new Results<Producto>(ps, startIndex, count);
 				try {
 					products = service.findByCriteria(c, language, startIndex, count);
@@ -277,15 +282,14 @@ public class ProductoServlet extends HttpServlet {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			}
-			if(g == null && id!=null) {
-
+				if(g == null) {
 					try {
 						p = service.findById(id, language);
 					} catch (Exception e) {
 						e.printStackTrace();
 						errors.add(ParameterNames.PRODUCT, ErrorCodes.FINDER_ERROR);
 					}
+				}
 			}else {
 				errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
 			}
@@ -296,7 +300,7 @@ public class ProductoServlet extends HttpServlet {
 			}else {
 				if(g!=null) {
 					SetAttribute.setResult(request, g);
-					target = ViewPaths.GAME_DETAIL;
+					target = ViewPaths.PRODUCT_DETAIL;
 				}else {
 					SetAttribute.setResult(request, p);
 					target = ViewPaths.PRODUCT_DETAIL;
@@ -346,10 +350,6 @@ public class ProductoServlet extends HttpServlet {
 					SetAttribute.setErrors(request, errors);
 				}
 			}else {
-				/*
-				 * Aqui hacer llamada ajax para actualizar automaticamente los comentarios.
-				 * Si no hay tiempo mandar recargar la misma pagina.
-				 */
 				send = false;
 			}
 		}
@@ -358,27 +358,18 @@ public class ProductoServlet extends HttpServlet {
 			
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			if(u!=null) {
-				userId = ValidationUtils.parseIntParameter(request, ParameterNames.USER_ID);
-				if(userId!=null) {
-					if(u.getIdUsuario().equals(userId)) {
-						id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
-						if(id!=null) {
-							try {
-								commentService.delete(id);
-							} catch (Exception e) {
-								e.printStackTrace();
-								errors.add(ParameterNames.COMMENT, ErrorCodes.REMOVE_ERROR);
-							}
-						}else {
-							errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
-						}
-					}else {
-						errors.add(ParameterNames.USER_ID, ErrorCodes.IDENTITY_ERROR);
+				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
+				if(id!=null) {
+					try {
+						commentService.delete(id);
+					} catch (Exception e) {
+						e.printStackTrace();
+						errors.add(ParameterNames.COMMENT, ErrorCodes.REMOVE_ERROR);
 					}
 				}else {
-					errors.add(ParameterNames.USER_ID, ErrorCodes.MANDATORY_PARAMETER);
+					errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
 				}
-			}else {
+			} else {
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
 				target = ViewPaths.HOME;
 			}
@@ -390,9 +381,6 @@ public class ProductoServlet extends HttpServlet {
 					SetAttribute.setErrors(request, errors);
 				}
 			}else {
-				/*
-				 * Llamada Ajax
-				 */
 				send = false;
 			}
 		}
@@ -412,28 +400,40 @@ public class ProductoServlet extends HttpServlet {
 					f.setValoracion(rate);
 				}
 				f.setUsuario(userId);
-				f.setFavorito(favourite);
 				f.setProducto(id);
 				if(rate==null && favourite==false) {
 					errors.add(ParameterNames.FAVOURITE, ErrorCodes.MANDATORY_PARAMETER);
 					errors.add(ParameterNames.RATE, ErrorCodes.MANDATORY_PARAMETER);
 				}
 				if(!errors.hasErrors()) {
+					Favorito exist = null;
 					try {
 						exist = favouriteService.exist(userId, id);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					
-					if(exist) {
+					if(exist!=null) {
+						if(favourite) {
+							if(exist.getFavorito()) {
+								fav = 0;
+								
+							} else {
+								fav = 1;
+							}
+						}
 						try {
-							favouriteService.update(f);
+							favouriteService.update(f, fav);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-					}else {
+					} else {
 						try {
-							favouriteService.create(f);
+							if(favourite) {
+								fav = 1;
+							} else {
+								fav = 0;
+							}
+							favouriteService.create(f, fav);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}

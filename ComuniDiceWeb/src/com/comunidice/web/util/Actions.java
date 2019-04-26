@@ -19,6 +19,7 @@ public interface Actions {
 	public static final String SEND_MESSAGE = "sendMessage";
 	public static final String REMOVE_MESSAGE = "removeMessage";
 	public static final String CHANGE_LOCALE = "changeLocale";
+	public static final String FAVOURITE_DETAILS = "favouriteDetails";
 	
 	public static final String SEARCH_PRODUCTS = "searchProducts";
 	public static final String DEFAULT_SEARCH = "defaultSearch";

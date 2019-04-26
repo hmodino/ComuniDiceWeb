@@ -24,7 +24,7 @@
 						<p>${r.descripcion}</p>		
 					</div>
 				</c:forEach>
-		
+			
 			<!-- Paginacion  -->
 			<p><center>
 		
