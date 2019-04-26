@@ -146,9 +146,10 @@ public class ValidationUtils {
 		 return s;
 	}
 	
-	public static Boolean parseBooleanParameter(HttpServletRequest request, String s) {
+	public static Boolean parseBooleanParameter(HttpServletRequest request, String name) {
 		
 		Boolean b = null;
+		String s = getParameter(request, name);
 		if(ParameterNames.TRUE.equalsIgnoreCase(s)) {
 			b = true;
 		}else {

@@ -11,23 +11,25 @@
 		<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.ADD_TO_CART %>"/>
 		<c:param name="<%=ParameterNames.ID %>" value="${result.idProducto}"/>
 	</c:url>
-	<div>
-		<ul>
-		<li>${result.nombre}</li>
-		<li>${result.descripcion}</li>
-		<li>${result.precio}</li>
-		<li>${result.fechaEntrada}</li>
-		<li>${result.stock}</li>
-		<li>${result.valoracion}</li>
+	<div id="vistaDetalleProducto">
+		<p>${result.nombre}</p>
+		<p>${result.descripcion}</p>
+		<p>${result.precio}</p>
+		<p>${result.fechaEntrada}</p>
+		<p>${result.stock}</p>
+		<p>${result.valoracion}</p>
 		<c:if test="${not empty result.comentarios}">
+			<div id="comentarios">
 			<c:forEach items="${result.comentarios}" var="c">
-				<li>${c.fecha}</li>
-				<li>${c.contenido}</li>
+				<div id="comentario">
+					<p>${c.fecha}</p>
+					<p>${c.contenido}</p>
+				</div>
 			</c:forEach>
+			</div>
 		</c:if>
-		<li><a href="${fav}"><fmt:message key="favorito" bundle="${messages}"/></a></li>
-		<li><a href="${cart}"><fmt:message key="anadirCarrito" bundle="${messages}"/></a></li>
-		</ul>
+		<p><a href="${fav}"><fmt:message key="favorito" bundle="${messages}"/></a></p>
+		<p><a href="${cart}"><fmt:message key="anadirCarrito" bundle="${messages}"/></a></p>
 		<p><fmt:message key="valoracion" bundle="${messages}"/></p>
 		<form action="<%=ControllerPaths.PRODUCTO %>" method="post">
 			<input type="hidden" name="<%=ParameterNames.ACTION%>" value="<%=Actions.FAVOURITE%>"/>
@@ -45,6 +47,12 @@
 				<option value="4.5">4.5</option>
 				<option value="5.0">5</option>
 			</select>
+		</form>
+		<form action="<%=ControllerPaths.PRODUCTO %>" method="post">
+			<input type="hidden" name="<%=ParameterNames.ACTION %>" value="<%=Actions.CREATE_COMMENT %>"/>
+			<input type="hidden" name="<%=ParameterNames.ID%>" value="${result.idProducto}"/>
+			<textarea rows="25" cols="100" name="<%=ParameterNames.CONTENT%>"></textarea>
+			<input type="submit" value="<fmt:message key="enviar" bundle="${messages}"/>"/>
 		</form>
 	</div>
 </c:if>

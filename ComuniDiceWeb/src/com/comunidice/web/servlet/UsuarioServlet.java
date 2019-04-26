@@ -47,23 +47,23 @@ import com.rollanddice.comunidice.service.spi.UsuarioService;
 public class UsuarioServlet extends HttpServlet {
 
 	private static Logger logger = LogManager.getLogger(UsuarioServlet.class);
-	
+
 	private UsuarioService service = null;
 	private AmigoService amigoService = null;
 	private MensajeService mensajeService = null;
 	private DireccionService direccionService = null;
-	
-    public UsuarioServlet() {
-    	super();
-    	service = new UsuarioServiceImpl();
-    	amigoService = new AmigoServiceImpl();
-    	mensajeService = new MensajeServiceImpl();
-    	direccionService = new DireccionServiceImpl();
-    }
+
+	public UsuarioServlet() {
+		super();
+		service = new UsuarioServiceImpl();
+		amigoService = new AmigoServiceImpl();
+		mensajeService = new MensajeServiceImpl();
+		direccionService = new DireccionServiceImpl();
+	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
-	
+
 		Errors errors = new Errors();
 		Usuario u = null;
 		Direccion d = null;;
@@ -76,9 +76,9 @@ public class UsuarioServlet extends HttpServlet {
 		List<Mensaje> messages = null;
 		List<Usuario> friends = null;
 		List<Locale> locales = null;
-		
+
 		String action = ValidationUtils.parameterIsEmpty(request, ParameterNames.ACTION);
-		
+
 		String target = null;
 		String email = null;
 		String password = null;
@@ -101,12 +101,12 @@ public class UsuarioServlet extends HttpServlet {
 		String messageType = null;
 		String messageContent = null;
 		String language = null;
-		
+
 		Boolean redirect = false;
 		Boolean send = true;
-		
+
 		if (Actions.LOGIN.equalsIgnoreCase(action)) {
-			
+
 			email = ValidationUtils.parameterIsEmpty(request, ParameterNames.EMAIL);
 			password = ValidationUtils.parameterIsEmpty(request, ParameterNames.PASSWORD);
 
@@ -131,7 +131,7 @@ public class UsuarioServlet extends HttpServlet {
 					target = ViewPaths.HOME;
 					redirect = true;
 				}
-				
+
 				errors.add(ParameterNames.ACTION,ErrorCodes.AUTHENTICATION_ERROR);				
 				SetAttribute.setErrors(request, errors);
 				target = ViewPaths.LOGIN;
@@ -143,19 +143,19 @@ public class UsuarioServlet extends HttpServlet {
 				redirect = true;
 			}
 		}
-		
+
 		else if(Actions.LOGOUT.equalsIgnoreCase(action)) {
-			
+
 			SessionManager.set(request, SessionAttributeNames.USER, null);
 			SessionManager.set(request, AttributeNames.SHOPPING_CART, null);
 			target = ViewPaths.HOME;
 			redirect = true;
 		}
-		
+
 		else if(Actions.SEARCH_USERS.equalsIgnoreCase(action)) {
-			
+
 			searchBy = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_BY);
-			
+
 			if(searchBy.equalsIgnoreCase(ParameterNames.EMAIL)) {
 				email = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_BOX);
 				if(email == null) {
@@ -167,7 +167,7 @@ public class UsuarioServlet extends HttpServlet {
 					errors.add(ParameterNames.EMAIL,ErrorCodes.MANDATORY_PARAMETER);
 				}
 			}
-			
+
 			if(!errors.hasErrors()) {
 				try {
 					if(email != null) {
@@ -195,11 +195,11 @@ public class UsuarioServlet extends HttpServlet {
 				SetAttribute.setResult(request, u);
 			}
 		}
-		
+
 		else if(Actions.SIGN_UP.equalsIgnoreCase(action)) {
-			
+
 			u = new Usuario();
-			
+
 			name = ValidationUtils.parameterIsEmpty(request, ParameterNames.NAME);
 			password = ValidationUtils.parameterIsEmpty(request, ParameterNames.PASSWORD);
 			email = ValidationUtils.parameterIsEmpty(request, ParameterNames.EMAIL);
@@ -216,7 +216,7 @@ public class UsuarioServlet extends HttpServlet {
 			portal = ValidationUtils.parameterIsEmpty(request, ParameterNames.PORTAL);
 			floor = ValidationUtils.parseIntParameter(request, ParameterNames.FLOOR);
 			other = ValidationUtils.parameterIsEmpty(request, ParameterNames.DIRECTION_OTHERS);
-			
+
 			if(name != null) {
 				u.setNombre(name);
 			}else {
@@ -285,7 +285,7 @@ public class UsuarioServlet extends HttpServlet {
 			}
 
 			if(u == null || errors.hasErrors()) {
-				
+
 				if (logger.isDebugEnabled()) {
 					logger.debug("El usuario que buscas no existe: {}", errors);
 				}				
@@ -306,11 +306,11 @@ public class UsuarioServlet extends HttpServlet {
 				}
 			}
 		}
-		
+
 		else if(Actions.EDIT.equalsIgnoreCase(action)) {
 
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			
+
 			name = ValidationUtils.parameterIsEmpty(request, ParameterNames.NAME);
 			password = ValidationUtils.parameterIsEmpty(request, ParameterNames.PASSWORD);
 			email = ValidationUtils.parameterIsEmpty(request, ParameterNames.EMAIL);
@@ -384,7 +384,7 @@ public class UsuarioServlet extends HttpServlet {
 			}
 
 			if(errors.hasErrors()) {
-				
+
 				if (logger.isDebugEnabled()) {
 					logger.debug("El usuario que buscas no existe: {}", errors);
 				}				
@@ -392,7 +392,7 @@ public class UsuarioServlet extends HttpServlet {
 				redirect = false;
 				SetAttribute.setErrors(request, errors);
 			}else {
-				if(u!=null && d!=null) {
+				if(u!=null) {
 					try {
 						service.editar(u, d);	
 						SetAttribute.setResult(request, u);
@@ -421,11 +421,11 @@ public class UsuarioServlet extends HttpServlet {
 				}
 			}
 		}
-		
+
 		else if(Actions.DETAIL_VIEW.equalsIgnoreCase(action)) {
-		
+
 			id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
-			
+
 			if(id != null) {
 				try {
 					u = service.findById(id);
@@ -435,13 +435,13 @@ public class UsuarioServlet extends HttpServlet {
 				}
 			}else {
 				errors.add(ParameterNames.ID, ErrorCodes.URL_ERROR);
-	
+
 			}
 			if(u!=null) {
-			request.setAttribute(AttributeNames.USER, u);
-			target = ViewPaths.PROFILE;
-			redirect = false;
-			SetAttribute.setResult(request, u);
+				request.setAttribute(AttributeNames.USER, u);
+				target = ViewPaths.PROFILE;
+				redirect = false;
+				SetAttribute.setResult(request, u);
 			}
 			else{
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
@@ -450,14 +450,14 @@ public class UsuarioServlet extends HttpServlet {
 				target = ViewPaths.HOME;
 				redirect = false;
 				SetAttribute.setErrors(request, errors);
-				
+
 			}
 		}
-		
+
 		else if(Actions.PROFILE_VIEW.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			
+
 			if(u==null) {
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
 				target = ViewPaths.HOME;
@@ -469,11 +469,11 @@ public class UsuarioServlet extends HttpServlet {
 				SetAttribute.setResult(request, u);
 			}
 		} 
-		
+
 		else if(Actions.FIND_FRIENDS.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario)SessionManager.get(request, AttributeNames.USER);
-			
+
 			if(u != null) {
 				friends = new ArrayList<Usuario>();
 				try{
@@ -493,19 +493,19 @@ public class UsuarioServlet extends HttpServlet {
 				}
 				redirect = false;
 				SetAttribute.setErrors(request, errors);
-				
+
 			}else {
 				target = ViewPaths.FRIENDS_FINDER;
 				redirect = false;
 				SetAttribute.setResults(request, friends);
 			}
 		}
-		
+
 		else if(Actions.FIND_FRIENDS_BY.equalsIgnoreCase(action)) {
 
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			searchBy = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_BY);
-			
+
 			if(u == null) {
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
 				target = ViewPaths.HOME;
@@ -548,14 +548,14 @@ public class UsuarioServlet extends HttpServlet {
 				SetAttribute.setResults(request, friends);
 			}
 		}
-		
+
 		else if(Actions.ADD_FRIEND.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			
+
 			if(u != null) {
 				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
-				
+
 				if(id == null) {
 					errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
 				}
@@ -567,7 +567,7 @@ public class UsuarioServlet extends HttpServlet {
 				redirect = true;
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
 			}
-			
+
 			if(!errors.hasErrors()) {
 				try {
 					amigoService.create(u.getIdUsuario(), id);
@@ -588,14 +588,14 @@ public class UsuarioServlet extends HttpServlet {
 				SetAttribute.setUser(request, u);
 			}
 		}
-		
+
 		else if(Actions.REMOVE_FRIEND.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			
+
 			if(u != null) {
 				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
-				
+
 				if(id == null) {
 					errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
 				}
@@ -603,7 +603,7 @@ public class UsuarioServlet extends HttpServlet {
 				target = ViewPaths.HOME;
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
 			}
-			
+
 			if(!errors.hasErrors()) {
 				try {
 					amigoService.delete(u.getIdUsuario(), id);
@@ -624,11 +624,11 @@ public class UsuarioServlet extends HttpServlet {
 				SetAttribute.setUser(request, u);
 			}
 		}
-		
+
 		else if(Actions.FIND_MESSAGES.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			
+
 			if(u !=null) {
 				messages = new ArrayList<Mensaje>();
 				messageType = ValidationUtils.parameterIsEmpty(request, ParameterNames.MESSAGE_TYPE);
@@ -647,7 +647,7 @@ public class UsuarioServlet extends HttpServlet {
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
 				target = ViewPaths.HOME;
 			}
-			
+
 			if(errors.hasErrors()) {
 				if(target == null) {
 					target = ViewPaths.USER_PROFILE; 
@@ -660,22 +660,22 @@ public class UsuarioServlet extends HttpServlet {
 				SetAttribute.setResults(request, messages);
 			}
 		}
-		
-		
+
+
 		else if(Actions.PRE_SEND_MESSAGE.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			
+
 			if(u != null) {
 				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 				if(id==null) {
 					friends = new ArrayList<Usuario>();
-						try {
-							friends = amigoService.findAmigos(u.getIdUsuario());
-						} catch (Exception e) {
-							errors.add(ParameterNames.FRIEND, ErrorCodes.NOT_FOUND_OBJECT);
-							e.printStackTrace();
-						}
+					try {
+						friends = amigoService.findAmigos(u.getIdUsuario());
+					} catch (Exception e) {
+						errors.add(ParameterNames.FRIEND, ErrorCodes.NOT_FOUND_OBJECT);
+						e.printStackTrace();
+					}
 				}
 				if(id!=null && friends!=null) {
 					errors.add(ParameterNames.ID, ErrorCodes.EXCLUSIVE_PARAMETERS);
@@ -686,9 +686,9 @@ public class UsuarioServlet extends HttpServlet {
 				}
 			}else {
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
-				target = ViewPaths.HOME;
+				target = ViewPaths.LOGIN;
 			}
-			
+
 			if(errors.hasErrors()) {
 				if(target == null) {
 					target = ViewPaths.USER_PROFILE;
@@ -698,7 +698,9 @@ public class UsuarioServlet extends HttpServlet {
 			}else {
 				target = ViewPaths.SEND_MESSAGE;
 				redirect = false;
-				SetAttribute.setOthers(request, AttributeNames.USER, userName);
+				//				if(userName!=null) {
+				//					SetAttribute.setOthers(request, AttributeNames.USER, userName);
+				//				}
 				if(id!=null) {
 					SetAttribute.setOthers(request, AttributeNames.ID, id);
 				}
@@ -707,12 +709,12 @@ public class UsuarioServlet extends HttpServlet {
 				}
 			}
 		}
-		
+
 		else if(Actions.SEND_MESSAGE.equalsIgnoreCase(action)) {
-			
+
 			m = new Mensaje();
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			
+
 			if(u!=null) {
 				messageContent = ValidationUtils.parameterIsEmpty(request, ParameterNames.CONTENT);
 				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
@@ -723,8 +725,8 @@ public class UsuarioServlet extends HttpServlet {
 					errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
 				}
 			}else {
-					errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
-					target = ViewPaths.HOME;
+				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
+				target = ViewPaths.HOME;
 			}
 			if(!errors.hasErrors()){
 				try {
@@ -749,19 +751,19 @@ public class UsuarioServlet extends HttpServlet {
 				SetAttribute.setUser(request, u);
 			}
 		}
-		
+
 		else if(Actions.REMOVE_MESSAGE.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			
+
 			if(u!=null) {
 				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 				if(id==null) {
 					errors.add(ParameterNames.ID, ErrorCodes.MANDATORY_PARAMETER);
 				}
 			}else {
-					errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
-					target = ViewPaths.HOME;
+				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
+				target = ViewPaths.HOME;
 			}
 			if(!errors.hasErrors()){
 				try {
@@ -782,7 +784,7 @@ public class UsuarioServlet extends HttpServlet {
 				SetAttribute.setUser(request, u);
 			}
 		}
-		
+
 		else if(Actions.CHANGE_LOCALE.equalsIgnoreCase(action)) {
 
 			language = ValidationUtils.parameterIsEmpty(request, ParameterNames.LANGUAGE);
@@ -792,9 +794,15 @@ public class UsuarioServlet extends HttpServlet {
 				SessionManager.set(request, WebConstants.USER_LOCALE, locale);
 				CookieManager.addCookie(response, WebConstants.USER_LOCALE, locale.toString(), "/", 365*24*60*60);
 			}
-			send = false;
-			redirect = true;
-			
+				String url = ValidationUtils.parameterIsEmpty(request, ParameterNames.URL);
+				if(url!=null) {
+					url = url.split("ComuniDiceWeb")[1];
+					target = url;
+					redirect = true;
+					logger.debug(url); 
+				} else {
+					send = false;
+				}
 		}
 		RedirectOrForward.send(request, response, redirect, target, send);
 	}

@@ -1,8 +1,7 @@
-<%@page import="java.util.*" %>
 <%@include file="/html/common/header.jsp"%>
-
-<!-- Total de resultados  -->
-	<div id="resultadosProductos">
+<div id="home">
+	<h1><fmt:message key = "bienvenida" bundle="${messages}"/></h1>
+	<div id="busquedaPorDefecto">
 		<p>
 			<c:if test="${not empty total}">
 				<fmt:message key="encontrados" bundle="${messages}">
@@ -75,4 +74,6 @@
 			
 		</c:if>
 	</div>
+	</div>
 <%@include file="/html/common/footer.jsp"%>
+

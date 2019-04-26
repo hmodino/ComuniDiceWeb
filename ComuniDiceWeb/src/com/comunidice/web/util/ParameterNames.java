@@ -29,6 +29,7 @@ public interface ParameterNames {
 	public static final String MESSAGE_TYPE = "messageType";
 	public static final String SENDER = "sender";
 	public static final String RECEIVER = "receiver";
+	public static final String REMEMBERME = "rememberMe";
 	
 	public static final String PAGE = "page";
 	public static final String COUNT = "count";
@@ -62,4 +63,6 @@ public interface ParameterNames {
 	public static final String CARD_NUMBER = "cardNumber";
 	public static final String EXPIRE_DATE = "expireDate";
 	public static final String INDEX = "index";
+	public static final String DEFAULT = "default";
+	public static final String URL = "url";
 }

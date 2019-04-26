@@ -3,8 +3,10 @@
 	
 	<c:choose>
 		<c:when test="${empty sessionScope['user']}">
-			<a href="/ComuniDiceWeb<%=ViewPaths.LOGIN%>"><fmt:message key="entrar" bundle="${messages}"/></a>
-			<a href="/ComuniDiceWeb<%=ViewPaths.SIGNUP%>"><fmt:message key="registro" bundle="${messages}"/></a>
+			<div id="usuario">
+				<a href="/ComuniDiceWeb<%=ViewPaths.LOGIN%>"><fmt:message key="entrar" bundle="${messages}"/></a>
+				<a href="/ComuniDiceWeb<%=ViewPaths.SIGNUP%>"><fmt:message key="registro" bundle="${messages}"/></a>
+			</div>
 		</c:when>
 		<c:otherwise>
 				<!-- usuario autenticado -->

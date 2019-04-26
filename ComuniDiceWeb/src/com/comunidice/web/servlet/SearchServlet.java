@@ -25,11 +25,13 @@ public class SearchServlet extends HttpServlet {
 
 		String type = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_TYPE);
 		String target = null;
+		String defaultSearch = ValidationUtils.parameterIsEmpty(request, ParameterNames.DEFAULT);
 		if(type.equalsIgnoreCase(ParameterNames.SEARCH_USER)) {
 			target = ControllerPaths.NO_CONTEXT_USUARIO.concat("?").concat(ParameterNames.ACTION).concat("=").concat(Actions.SEARCH_USERS);
 		}
 		if(type.equalsIgnoreCase(ParameterNames.SEARCH_PRODUCT)) {
-			target = ControllerPaths.NO_CONTEXT_PRODUCTO.concat("?").concat(ParameterNames.ACTION).concat("=").concat(Actions.SEARCH_PRODUCTS);
+			target = ControllerPaths.NO_CONTEXT_PRODUCTO.concat("?").concat(ParameterNames.ACTION).concat("=").concat(Actions.SEARCH_PRODUCTS)
+					.concat("&").concat(ParameterNames.DEFAULT).concat("=").concat(defaultSearch);
 		}
 		RedirectOrForward.send(request, response, false, target, true);
 	}

@@ -131,6 +131,7 @@ public class ProductoServlet extends HttpServlet {
 		Integer index = null;
 		String cardNumber = null;
 		Date expireDate = null;
+		Boolean defaultSearch = null;
 		
 		String url = null;
 		String target = null;
@@ -163,6 +164,8 @@ public class ProductoServlet extends HttpServlet {
 			startIndex = (page-1)*count+1;
 			
 			language = SessionManager.get(request, WebConstants.USER_LOCALE).toString();
+			
+			defaultSearch = ValidationUtils.parseBooleanParameter(request, ParameterNames.DEFAULT);
 
 			if(categoryId!=null) {
 				c.setIdCategoria(categoryId);
@@ -239,7 +242,11 @@ public class ProductoServlet extends HttpServlet {
 				
 				SetAttribute.setErrors(request, errors);
 			}else {
-				target = ViewPaths.PRODUCTS_FINDER;
+				if(defaultSearch==true) {
+					target = ViewPaths.HOME;
+				} else {
+					target = ViewPaths.PRODUCTS_FINDER;
+				}
 				redirect = false;
 				if(game) {
 					SetAttribute.setResults(request, gs);
@@ -249,40 +256,7 @@ public class ProductoServlet extends HttpServlet {
 				}
 				firstPagedPage = Math.max(1, page-pagingPageCount);
 				lastPagedPage = Math.min(totalPages, page+pagingPageCount);
-				url = ParameterUtils.criteriaURLBuilder(c);
-				SetAttribute.setOthers(request, ParameterNames.PAGE, page);
-				SetAttribute.setOthers(request, AttributeNames.TOTAL_PAGES, totalPages);
-				SetAttribute.setOthers(request, AttributeNames.FIRST_PAGED_PAGE, firstPagedPage);
-				SetAttribute.setOthers(request, AttributeNames.LAST_PAGED_PAGE, lastPagedPage);
-				SetAttribute.setOthers(request, AttributeNames.URL, url);
-			}
-		}
-		
-		else if(Actions.DEFAULT_SEARCH.equalsIgnoreCase(action)) {
-			
-			ps = new ArrayList<Producto>();
-			products = new Results<Producto>(ps, startIndex, count);
-			c = new Criteria();
-			c.setValoracion(4);
-			
-			page = WebUtils.getPage(request, ParameterNames.PAGE);
-			startIndex = (page-1)*count+1;
-			
-			try {
-				products = service.findByCriteria(c, language, startIndex, count);
-			}catch(Exception e) {
-				errors.add(ParameterNames.PRODUCT, ErrorCodes.NOT_FOUND_OBJECT);
-			}
-			if(!errors.hasErrors()) {
-				
-				ps = products.getPage();
-				
-				totalPages = (int) Math.ceil((double)products.getTotal()/(double)count);
-				firstPagedPage = Math.max(1, page-pagingPageCount);
-				lastPagedPage = Math.min(totalPages, page+pagingPageCount);
-				url = ParameterUtils.criteriaURLBuilder(c);
-				
-				SetAttribute.setOthers(request, AttributeNames.PRODUCTS, ps);
+				url = ParameterUtils.criteriaURLBuilder(c, defaultSearch, request);
 				SetAttribute.setOthers(request, ParameterNames.PAGE, page);
 				SetAttribute.setOthers(request, AttributeNames.TOTAL_PAGES, totalPages);
 				SetAttribute.setOthers(request, AttributeNames.FIRST_PAGED_PAGE, firstPagedPage);

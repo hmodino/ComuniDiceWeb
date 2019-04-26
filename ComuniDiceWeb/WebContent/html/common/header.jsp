@@ -14,17 +14,28 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 </head>
 <body>
-		<a href="/ComuniDiceWeb<%=ViewPaths.HOME%>"><img src="<%=request.getContextPath()%>/imgs/d8.png" width="100" height="100" alt="ComuniDice Logo"/></a>
-		<c:url var="en" scope="page" value="<%=ControllerPaths.NO_CONTEXT_USUARIO %>">
-			<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.CHANGE_LOCALE%>"/>
-			<c:param name="<%=ParameterNames.LANGUAGE%>" value="en_GB"/>
-		</c:url>
-		<c:url var="es" scope="page" value="<%=ControllerPaths.NO_CONTEXT_USUARIO %>">
-			<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.CHANGE_LOCALE%>"/>
-			<c:param name="<%=ParameterNames.LANGUAGE%>" value="es_ES"/>
-		</c:url>
-		<a href="${en}">EN</a>
-		<a href="${es}">ES</a>
-	
-	<%@include file="/html/common/user-menu.jsp"%>
-	<%@include file="/html/common/busqueda.jsp" %>	
+	<header>
+		<div id="logo">
+			<a href="/ComuniDiceWeb<%=ViewPaths.HOME%>">
+				<img src="<%=request.getContextPath()%>/imgs/d8.png" width="100" height="100" alt="ComuniDice Logo"/></a>
+		</div>
+			<c:url var="en" scope="page" value="<%=ControllerPaths.NO_CONTEXT_USUARIO %>">
+				<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.CHANGE_LOCALE%>"/>
+				<c:param name="<%=ParameterNames.LANGUAGE%>" value="en_GB"/>
+				<c:if test="${not empty url}">
+					<c:param name="<%=AttributeNames.URL%>" value="${url}"/>
+				</c:if>
+			</c:url>
+			<c:url var="es" scope="page" value="<%=ControllerPaths.NO_CONTEXT_USUARIO %>">
+				<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.CHANGE_LOCALE%>"/>
+				<c:param name="<%=ParameterNames.LANGUAGE%>" value="es_ES"/>
+			</c:url>
+		<div id="language">	
+			<a href="${en}">EN</a>
+			<a href="${es}">ES</a>
+		</div>
+	</header>
+	<nav>
+		<%@include file="/html/common/user-menu.jsp"%>
+		<%@include file="/html/common/busqueda.jsp" %>	
+	</nav>

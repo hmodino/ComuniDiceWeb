@@ -1,9 +1,9 @@
 <%@include file="/html/common/header.jsp"%>
 <div id="signup">
-	<h3><fmt:message key="registro" bundle="${messages}"/></h3>
+	<h1><fmt:message key="registro" bundle="${messages}"/></h1>
 	<form action="<%=ControllerPaths.USUARIO%>" method="post">
-	
-		<h4><fmt:message key="datosPersonales" bundle="${messages}"/></h4>
+		<div id="datosPersonales">
+			<h2><fmt:message key="datosPersonales" bundle="${messages}"/></h2>
 		
 			<input type="hidden" name="<%=ParameterNames.ACTION%>" value="<%=Actions.SIGN_UP%>"/>
 			
@@ -20,8 +20,9 @@
 			<input type="text" name="<%=ParameterNames.DESCRIPTION%>" placeholder="<fmt:message key="descripcion" bundle="${messages}"/>">
 				
 			<input type="text" name="<%=ParameterNames.PHONE%>" placeholder="<fmt:message key="telefono" bundle="${messages}"/>">
-			
-			<h4><fmt:message key="direccion" bundle="${messages}"/></h4>
+		</div>
+		<div id="direccion">
+			<h2><fmt:message key="direccion" bundle="${messages}"/></h2>
 			
 			<input type="text" name="<%=ParameterNames.MUNICIPALITY%>" placeholder="<fmt:message key="municipio" bundle="${messages}"/>">
 				
@@ -40,7 +41,8 @@
 			<input type="text" name="<%=ParameterNames.DIRECTION_OTHERS%>" placeholder="<fmt:message key="otros" bundle="${messages}"/>">
 							
 			<input type="submit" value="<fmt:message key="registro" bundle="${messages}"/>" />
-		</form>
+		</div>
+	</form>
 	
 </div>
 <%@include file="/html/common/footer.jsp"%>
