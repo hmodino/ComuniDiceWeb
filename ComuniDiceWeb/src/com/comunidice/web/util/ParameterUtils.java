@@ -71,12 +71,12 @@ public class ParameterUtils {
 		}
 		if(c.getAnhoPublicacionMinimo()!=null) {
 			criteria.append("&");
-			s = ValidationUtils.isEmpty(ValidationUtils.dateToString(c.getAnhoPublicacionMinimo()));
+			s = ValidationUtils.isEmpty(c.getAnhoPublicacionMinimo().toString());
 			criteria.append(ParameterNames.MIN_PUBLICATION_YEAR).append("=").append(s);
 		}
 		if(c.getAnhoPublicacionMaximo()!=null) {
 			criteria.append("&");
-			s = ValidationUtils.isEmpty(ValidationUtils.dateToString(c.getAnhoPublicacionMaximo()));
+			s = ValidationUtils.isEmpty(c.getAnhoPublicacionMaximo().toString());
 			criteria.append(ParameterNames.MAX_PUBLICATION_YEAR).append("=").append(s);
 		}
 		if(c.getFormato()!=null) {
