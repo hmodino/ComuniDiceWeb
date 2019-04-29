@@ -243,7 +243,7 @@ public class ProductoServlet extends HttpServlet {
 			}
 			if(errors.hasErrors()) {
 				target = ViewPaths.HOME;
-				redirect = false;
+				redirect = true;
 				
 				SetAttribute.setErrors(request, errors);
 			}else {

@@ -1,5 +1,5 @@
 <%@include file="/html/common/header.jsp"%>
-	<div id="resultadosMensajes">
+	<div id="resultadosMensajes" class="content">
 		<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.FIND_MESSAGES%>&amp;<%=ParameterNames.MESSAGE_TYPE%>=<%=ParameterNames.SENDER%>">
 		<fmt:message key="enviados" bundle="${messages}"/></a>
 		<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.FIND_MESSAGES%>&amp;<%=ParameterNames.MESSAGE_TYPE%>=<%=ParameterNames.RECEIVER%>">

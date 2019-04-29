@@ -1,5 +1,5 @@
 <%@include file="/html/common/header.jsp"%>
-	<div id="busquedaAmigos">
+	<div id="busquedaAmigos" class="content">
 		<form action="<%=ControllerPaths.USUARIO%>" method="post">
 			<input type="hidden" name="<%=ParameterNames.ACTION%>" value="<%=Actions.FIND_FRIENDS_BY%>"/>
 			<input type="text" name="<%=ParameterNames.SEARCH_BOX%>"/>
@@ -13,12 +13,12 @@
 			<input type="submit" value="<fmt:message key="enviar" bundle="${messages}"/>" />
 		</form>
 	</div>	
-	<div id="resultadosAmigos">
+	<div id="resultadosAmigos" class="content">
 		<c:if test="${not empty results}">
 			<c:forEach items="${results}" var="r">
-				<div class="resultadoAmigos">
-					<p id="nombre">${r.nombreUsuario}</p>
-					<p id="descripcion">${r.descripcion}</p>
+				<div class="resultado">
+					<p>${r.nombreUsuario}</p>
+					<p>${r.descripcion}</p>
 					<c:url var="urlEliminar" scope="page" value="<%=ControllerPaths.NO_CONTEXT_USUARIO %>">
 						<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.REMOVE_FRIEND%>"/>
 						<c:param name="<%=ParameterNames.ID%>" value="${r.idUsuario}"/>

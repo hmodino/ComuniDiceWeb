@@ -1,6 +1,6 @@
 <%@ page import="java.util.List" %>
 <%@include file="/html/common/header.jsp"%>
-<div id="login-form">
+<div id="login-form" class="content">
 		<h1><fmt:message key="autenticate" bundle="${messages}"/></h1>	
 		<form action="<%=ControllerPaths.USUARIO%>" method="post">
 			<input type="hidden" name="<%=ParameterNames.ACTION%>" value="<%=Actions.LOGIN%>"/>

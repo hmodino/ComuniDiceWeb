@@ -1,5 +1,5 @@
 <%@include file="/html/common/header.jsp"%>
-	<div id="favoritoPage">
+	<div id="favoritoPage" class="content">
 		<c:if test="${not empty results}">
 			<c:forEach items="${results}" var="r">
 				<c:url var="productDetail" scope="page" value="producto">

@@ -1,6 +1,6 @@
 <%@page import="java.util.*" %>
 <%@include file="/html/common/header.jsp"%>
-	<div id="Compra">
+	<div id="Compra" class="content">
 		<form action="<%=ControllerPaths.PRODUCTO%>" method="post">
 			<input type="hidden" name="<%=ParameterNames.ACTION%>" value="<%=Actions.PRE_BUY%>">
 			<input type="text" name="<%=ParameterNames.CARD_NUMBER%>" placeholder="<fmt:message key="tarjeta" bundle="${messages}"/>">

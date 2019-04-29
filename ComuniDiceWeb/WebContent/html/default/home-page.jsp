@@ -1,7 +1,7 @@
 <%@include file="/html/common/header.jsp"%>
 <div id="home">
-	<h1><fmt:message key = "bienvenida" bundle="${messages}"/></h1>
-	<div id="busquedaPorDefecto">
+	<h1 id="bienvenida"><fmt:message key = "bienvenida" bundle="${messages}"/></h1>
+	<div id="busquedaPorDefecto" class="resultados">
 		<p>
 			<c:if test="${not empty total}">
 				<fmt:message key="encontrados" bundle="${messages}">

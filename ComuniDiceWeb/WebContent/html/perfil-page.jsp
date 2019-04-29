@@ -1,5 +1,5 @@
 <%@include file="/html/common/header.jsp"%>
-<div id="vistaDetalleUsuario">
+<div id="vistaDetalleUsuario" class="content">
 	<c:if test="${not empty user}">
 		<c:url var="agregar" scope="page" value="<%=ControllerPaths.NO_CONTEXT_USUARIO %>">
 			<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.ADD_FRIEND%>"/>

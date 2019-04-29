@@ -1,6 +1,6 @@
 <%@page import="java.util.*" %>
 <%@include file="/html/common/header.jsp"%>
-	<div id="enviarMensaje">
+	<div id="enviarMensaje" class="content">
 		<form action="<%=ControllerPaths.USUARIO%>" method="post">
 			<input type="hidden" name="<%=ParameterNames.ACTION%>" value="<%=Actions.SEND_MESSAGE%>"/>
 			<c:if test="${not empty results}">

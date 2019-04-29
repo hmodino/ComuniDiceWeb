@@ -11,7 +11,7 @@
 		<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.ADD_TO_CART %>"/>
 		<c:param name="<%=ParameterNames.ID %>" value="${result.idProducto}"/>
 	</c:url>
-	<div id="vistaDetalleProducto">
+	<div id="vistaDetalleProducto" class="content">
 		<p>${result.nombre}</p>
 		<p>${result.descripcion}</p>
 		<p>${result.precio}</p>

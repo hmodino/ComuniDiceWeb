@@ -31,21 +31,25 @@ public class SearchServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		String type = ValidationUtils.parameterIsEmpty(request, ParameterNames.SEARCH_TYPE);
+		String action = ValidationUtils.parameterIsEmpty(request, ParameterNames.ACTION);
 		String target = null;
-		String defaultSearch = ValidationUtils.parameterIsEmpty(request, ParameterNames.DEFAULT);
+		String defaultSearch = null;
 		String url = ValidationUtils.parameterIsEmpty(request, ParameterNames.URL);
 		
-		if(ParameterNames.SEARCH_USER.equalsIgnoreCase(type)) {
+		if(Actions.SEARCH_USERS.equalsIgnoreCase(action)) {
 			target = ControllerPaths.NO_CONTEXT_USUARIO.concat("?").concat(ParameterNames.ACTION).concat("=").concat(Actions.SEARCH_USERS);
 		}
-		if(ParameterNames.SEARCH_PRODUCT.equalsIgnoreCase(type)) {
+		else if(Actions.SEARCH_PRODUCTS.equalsIgnoreCase(action)) {
 			if(url==null) {
 				target = ControllerPaths.NO_CONTEXT_PRODUCTO.concat("?").concat(ParameterNames.ACTION).concat("=").concat(Actions.SEARCH_PRODUCTS)
-					.concat("&").concat(ParameterNames.DEFAULT).concat("=").concat(defaultSearch);
+					.concat("&").concat(ParameterNames.DEFAULT).concat("=").concat("false");
 			} else {
 				target = url;
 			}
+		} else if(action==null) {
+			defaultSearch = ParameterNames.RATING.concat("=").concat("2");
+			target = ControllerPaths.NO_CONTEXT_PRODUCTO.concat("?").concat(ParameterNames.ACTION).concat("=").concat(Actions.SEARCH_PRODUCTS)
+					.concat("&").concat(ParameterNames.DEFAULT).concat("=").concat("true").concat(defaultSearch);
 		}
 		RedirectOrForward.send(request, response, false, target, true);
 	}

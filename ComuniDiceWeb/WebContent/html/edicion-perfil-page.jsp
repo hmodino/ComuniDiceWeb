@@ -1,5 +1,5 @@
 <%@include file="/html/common/header.jsp"%>
-	<div id="edicionPerfil">
+	<div id="edicionPerfil" class="content">
 		<form action="<%=ControllerPaths.USUARIO%>" method="post">
 			<div id="edicionDatos">
 				<h1><fmt:message key="datosPersonales" bundle="${messages}"/></h1>

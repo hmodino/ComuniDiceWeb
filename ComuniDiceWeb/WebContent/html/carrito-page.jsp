@@ -2,12 +2,12 @@
 <%@include file="/html/common/header.jsp"%>	
 	<c:if test="${not empty sessionScope['shoppingCart']}">
 		<c:if test="${not empty sessionScope['shoppingCart'].line }">
-			<div id="carrito">
+			<div id="carrito" class="resultados">
 				<c:url var="clear" scope="page" value="<%=ControllerPaths.NO_CONTEXT_PRODUCTO %>">
 					<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.CLEAR_CART%>"/>
 				</c:url>	
 				<c:forEach items="${sessionScope['shoppingCart'].line}" var="c" varStatus="loop">
-					<div class="lineaCarrito">
+					<div class="resultado">
 						<c:url var="remove" scope="page" value="<%=ControllerPaths.NO_CONTEXT_PRODUCTO%>">
 							<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.REMOVE_FROM_CART%>"/>
 							<c:param name="<%=ParameterNames.ID %>" value="${c.product.idProducto}"/>

@@ -5,7 +5,7 @@
 		<c:when test="${empty sessionScope['user']}">
 			<div id="usuario">
 				<a href="/ComuniDiceWeb<%=ViewPaths.LOGIN%>"><fmt:message key="entrar" bundle="${messages}"/></a>
-				<a href="/ComuniDiceWeb<%=ViewPaths.SIGNUP%>"><fmt:message key="registro" bundle="${messages}"/></a>
+				<a href="<%=ControllerPaths.USUARIO%>?<%=ParameterNames.ACTION%>=<%=Actions.PRE_SIGN_UP%>"><fmt:message key="registro" bundle="${messages}"/></a>
 			</div>
 		</c:when>
 		<c:otherwise>
@@ -26,4 +26,19 @@
 				</div>		
 		</c:otherwise>
 	</c:choose>
+	<c:url var="en" scope="page" value="<%=ControllerPaths.NO_CONTEXT_USUARIO %>">
+				<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.CHANGE_LOCALE%>"/>
+				<c:param name="<%=ParameterNames.LANGUAGE%>" value="en_GB"/>
+				<c:if test="${not empty url}">
+					<c:param name="<%=AttributeNames.URL%>" value="${url}"/>
+				</c:if>
+			</c:url>
+			<c:url var="es" scope="page" value="<%=ControllerPaths.NO_CONTEXT_USUARIO %>">
+				<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.CHANGE_LOCALE%>"/>
+				<c:param name="<%=ParameterNames.LANGUAGE%>" value="es_ES"/>
+			</c:url>
+		<div id="language">	
+			<a href="${en}">EN</a>
+			<a href="${es}">ES</a>
+		</div>
 </div>

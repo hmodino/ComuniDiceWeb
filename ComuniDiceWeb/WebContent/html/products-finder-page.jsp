@@ -2,7 +2,7 @@
 <%@include file="/html/common/header.jsp"%>
 
 <!-- Total de resultados  -->
-	<div id="resultadosProductos">
+	<div id="resultadosProductos" class="content">
 		<p>
 			<c:if test="${not empty total}">
 				<fmt:message key="encontrados" bundle="${messages}">
@@ -15,7 +15,7 @@
 		<c:if test="${not empty results}">
 			<!-- Listado -->
 				<c:forEach items="${results}" var="r">
-					<div class="resultadoProductos">
+					<div class="resultado">
 						<c:url var="urlDetail" scope="page" value="producto">
 							<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.DETAIL_VIEW%>"/>
 							<c:param name="<%=ParameterNames.ID %>" value="${r.idProducto}"/>

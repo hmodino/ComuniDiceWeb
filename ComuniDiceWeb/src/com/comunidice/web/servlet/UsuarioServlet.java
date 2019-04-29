@@ -29,6 +29,9 @@ import com.comunidice.web.util.SetAttribute;
 import com.comunidice.web.util.ValidationUtils;
 import com.comunidice.web.util.ViewPaths;
 import com.comunidice.web.util.WebConstants;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.rollanddice.comunidice.exception.DataException;
 import com.rollanddice.comunidice.model.Direccion;
 import com.rollanddice.comunidice.model.Favorito;
 import com.rollanddice.comunidice.model.Mensaje;
@@ -56,7 +59,7 @@ public class UsuarioServlet extends HttpServlet {
 	private MensajeService mensajeService = null;
 	private DireccionService direccionService = null;
 	private FavoritoService favoritoService = null;
-
+	
 	public UsuarioServlet() {
 		super();
 		service = new UsuarioServiceImpl();
@@ -82,7 +85,9 @@ public class UsuarioServlet extends HttpServlet {
 		List<Usuario> friends = null;
 		List<Locale> locales = null;
 		List<Favorito> favorito = null;
-
+		List<Region> regions = null;
+		List<Pais> countries = null;
+		
 		String action = ValidationUtils.parameterIsEmpty(request, ParameterNames.ACTION);
 
 		String target = null;
@@ -148,6 +153,7 @@ public class UsuarioServlet extends HttpServlet {
 				target = ViewPaths.HOME;
 				redirect = true;
 			}
+			System.out.println(request.getContextPath());
 		}
 
 		else if(Actions.LOGOUT.equalsIgnoreCase(action)) {
@@ -202,6 +208,40 @@ public class UsuarioServlet extends HttpServlet {
 			}
 		}
 
+		else if (Actions.PRE_SIGN_UP.equalsIgnoreCase(action)){
+
+			id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
+
+			try {
+				countries = direccionService.findAll();
+
+				if(id!=null) {
+					regions = direccionService.findByPais(id);
+					JsonObject region = null;
+					JsonArray array = new JsonArray();
+					for (Region rg: regions) {
+						region = new JsonObject();
+						region.addProperty("id", rg.getIdRegion());
+						region.addProperty("nome", rg.getNombre());
+						array.add(region);
+					}	
+					response.setContentType("application/json;charset=ISO-8859-1");
+					response.getOutputStream().write(array.toString().getBytes());
+					return;
+				}
+				else {
+					SetAttribute.setResults(request, countries);
+					target = ViewPaths.SIGNUP;
+				}
+
+			} catch (DataException e) {
+				logger.warn(e.getMessage(),e);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		else if(Actions.SIGN_UP.equalsIgnoreCase(action)) {
 
 			u = new Usuario();

@@ -1,0 +1,116 @@
+* {
+	margin: 0 auto;
+	padding: 0;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 1em;
+	color: #000000;
+}
+
+body { background-color: #b75f02; }
+
+a:link, a:visited {
+	text-decoration: none;
+	border: none;
+}
+
+a:hover, a:active {
+	text-decoration: underline;
+	border: none;
+}
+
+ #logo{
+ 	background: url(/ComuniDiceWeb/imgs/header.png);
+	width: 900px;
+	height: 50px;
+	padding-bottom:40px;
+	margin-right: auto;
+	margin-left: auto;
+ }
+ 
+ #logo h1{
+ 	color: #ff9c00;
+	font-size: 1.5em;
+	text-align: center;
+	font-weight: bold;
+	display: inline;
+ }
+
+#user-menu{
+	background: url(/ComuniDiceWeb/imgs/bg_big_menu.gif);
+	width: 900px;
+	height: 50px;
+	padding-top:10px;
+	margin-right: auto;
+	margin-left: auto;
+	text-align:right;
+}
+
+#user-menu a {
+	color: #f6ae2c;
+	font-variant: small-caps;
+	font-size: 1.3em;
+	padding: 0 30px;
+	text-decoration: none;
+}
+
+#busqueda {
+	background: url(/ComuniDiceWeb/imgs/busqueda.gif) no-repeat;
+	width: 900px;
+	height: 250px;
+	margin-left: auto;
+	margin-right:auto;
+}
+
+#busqueda-content{
+	width:750px;
+	position: absolute;
+	margin-top: 30px;
+	margin-left:80px;
+}
+
+#busqueda p{
+	color: #906014;
+	font-size: 0.8em;
+	text-align: center;
+	font-weight: bold;
+	display: inline;
+}
+
+#hiddenCriteria, #hiddenUsuario{
+	visibility:hidden;
+}
+
+#productoCheck:checked ~ #hiddenCriteria{
+	visibility:visible;
+}
+
+#usuarioCheck:checked ~ #hiddenUsuario{
+	visibility:visible;
+}
+
+.content{
+	background:url(/ComuniDiceWeb/imgs/middle_frame.gif) repeat-y;
+	margin-left: auto;
+	margin-right:auto;
+	width: 900px;
+	text-align:center;
+}
+
+.resultado{
+	text-align:center;
+	background:url(/ComuniDiceWeb/imgs/pachemin1.gif) no-repeat;
+	height:100px;
+	width:450px;
+}
+.resultado p, .resultado a{
+	position:relative;
+	top:20px;
+}
+
+footer{
+	background: url(/ComuniDiceWeb/imgs/bg_footer.gif) no-repeat;
+	width: 900px;
+	height:250px;
+	margin-left: auto;
+	margin-right:auto;
+}
