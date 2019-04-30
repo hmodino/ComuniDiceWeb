@@ -5,9 +5,9 @@
 	<div id="resultadosProductos" class="content">
 		<p>
 			<c:if test="${not empty total}">
-				<fmt:message key="encontrados" bundle="${messages}">
+				<h2><fmt:message key="encontrados" bundle="${messages}" >
 					<fmt:param value="${total}"/>
-				</fmt:message>		
+				</fmt:message></h2>		
 			</c:if>
 		</p>
 		

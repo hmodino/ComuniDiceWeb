@@ -9,13 +9,13 @@
 			</div>
 		</c:when>
 		<c:otherwise>
-				<!-- usuario autenticado -->
+		
 				<div id="usuario">
-					<p>${sessionScope['user'].nombre}</p>
-					<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.LOGOUT%>">
-						<fmt:message key="salir" bundle="${messages}"/></a>
-					<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.PROFILE_VIEW %>">
-						<fmt:message key="perfil" bundle="${messages}"/></a>
+				<div class="menudes">
+                    <p onclick="desplegarMenu()" class="dropbtn">${sessionScope['user'].nombreUsuario}</p>
+                    <div id="meumenudes" class="menudes-contido">
+                       <a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.PROFILE_VIEW %>">
+						<fmt:message key="perfil" bundle="${messages}"/></a>   
 					<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.FIND_FRIENDS %>">
 						<fmt:message key="amigos" bundle="${messages}"/></a>
 					<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.FIND_MESSAGES %>">
@@ -23,6 +23,12 @@
 					<a href="/ComuniDiceWeb<%=ViewPaths.CART%>"><fmt:message key="carrito" bundle="${messages}"/></a>
 					<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.FAVOURITE_DETAILS%>">
 						<fmt:message key="favoritos" bundle="${messages}"/></a>
+					<a href="<%=ControllerPaths.USUARIO%>?action=<%=Actions.LOGOUT%>">
+						<fmt:message key="salir" bundle="${messages}"/></a>
+                    </div>
+        
+        
+                </div>
 				</div>		
 		</c:otherwise>
 	</c:choose>

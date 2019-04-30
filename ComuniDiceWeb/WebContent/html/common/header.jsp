@@ -13,15 +13,15 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<link rel="stylesheet" type="text/css" media="screen" href="/ComuniDiceWeb/css/style.css" />
-	<script type="text/javascript" src="<%=request.getContextPath()%>/javascript/jquery-3.3.1.min.js"></script> 
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/ajax.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery-3.3.1.min.js"></script> 
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/menu.js"></script> 
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/ajax.js"></script>
 </head>
 <body>
 	<header>
 		<div id="logo">
 			<a href="/ComuniDiceWeb<%=ViewPaths.HOME%>">
-				<img src="<%=request.getContextPath()%>/imgs/d8.png" width="100" height="100" alt="ComuniDice Logo"/></a>
-			<h1>ComuniDice</h1>
+				<img src="<%=request.getContextPath()%>/imgs/comunidice1.png" width="180" height="180" alt="ComuniDice Logo"/></a>
 		</div>
 		<nav>
 			<%@include file="/html/common/user-menu.jsp"%>

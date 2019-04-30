@@ -4,19 +4,20 @@
 			<input type="hidden" name="<%=ParameterNames.ACTION%>" value="<%=Actions.FIND_FRIENDS_BY%>"/>
 			<input type="text" name="<%=ParameterNames.SEARCH_BOX%>"/>
 				<p><fmt:message key = "buscarPor" bundle="${messages}"/></p>
-				<select>
-					<option name="<%=ParameterNames.SEARCH_BY%>"value="<%=ParameterNames.EMAIL%>">
+				<select name="<%=ParameterNames.SEARCH_BY%>">
+					<option value="<%=ParameterNames.EMAIL%>">
 						<fmt:message key="email" bundle="${messages}"/></option>
-					<option name="<%=ParameterNames.SEARCH_BY%>"value="<%=ParameterNames.USER_NAME%>">
+					<option value="<%=ParameterNames.USER_NAME%>">
 						<fmt:message key="nombre" bundle="${messages}"/></option>
 				</select>
 			<input type="submit" value="<fmt:message key="enviar" bundle="${messages}"/>" />
 		</form>
 	</div>	
 	<div id="resultadosAmigos" class="content">
+		<h1><fmt:message key="amigos" bundle="${messages}"/></h1>
 		<c:if test="${not empty results}">
 			<c:forEach items="${results}" var="r">
-				<div class="resultado">
+				<div class="resultadoSinFondo">
 					<p>${r.nombreUsuario}</p>
 					<p>${r.descripcion}</p>
 					<c:url var="urlEliminar" scope="page" value="<%=ControllerPaths.NO_CONTEXT_USUARIO %>">

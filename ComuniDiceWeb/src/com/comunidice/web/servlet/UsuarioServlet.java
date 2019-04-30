@@ -222,7 +222,7 @@ public class UsuarioServlet extends HttpServlet {
 					for (Region rg: regions) {
 						region = new JsonObject();
 						region.addProperty("id", rg.getIdRegion());
-						region.addProperty("nome", rg.getNombre());
+						region.addProperty("nombre", rg.getNombre());
 						array.add(region);
 					}	
 					response.setContentType("application/json;charset=ISO-8859-1");
@@ -588,6 +588,7 @@ public class UsuarioServlet extends HttpServlet {
 				redirect = false;
 				SetAttribute.setErrors(request, errors);
 			}else {
+				friends = new ArrayList<Usuario>();
 				friends.add(u);
 				target = ViewPaths.FRIENDS_FINDER;
 				redirect = false;

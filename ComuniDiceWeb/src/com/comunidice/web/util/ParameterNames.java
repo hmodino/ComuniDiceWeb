@@ -56,6 +56,7 @@ public interface ParameterNames {
 	public static final String TRUE = "true";
 	public static final String FALSE = "false";
 	public static final String QUANTITY = "quantity";
+	public static final String TOTAL = "total";
 	
 	public static final String SEARCH_TYPE = "searchType";
 	public static final String SEARCH_USER = "searchUser";

@@ -224,6 +224,7 @@ public class ProductoServlet extends HttpServlet {
 				try {
 					games = service.findJuegoByCriteria(c, startIndex, count);
 					gs = games.getPage();
+					total = Math.ceil((double)games.getTotal());
 					totalPages = (int) Math.ceil((double)games.getTotal()/(double)count);
 					
 				} catch (Exception e) {
@@ -235,6 +236,7 @@ public class ProductoServlet extends HttpServlet {
 				try {
 					products = service.findByCriteria(c, language, startIndex, count);
 					ps = products.getPage();
+					total = Math.ceil((double)products.getTotal());
 					totalPages = (int) Math.ceil((double)products.getTotal()/(double)count);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -262,6 +264,7 @@ public class ProductoServlet extends HttpServlet {
 				firstPagedPage = Math.max(1, page-pagingPageCount);
 				lastPagedPage = Math.min(totalPages, page+pagingPageCount);
 				url = ParameterUtils.criteriaURLBuilder(c, defaultSearch, request);
+				SetAttribute.setOthers(request, ParameterNames.TOTAL, total);
 				SetAttribute.setOthers(request, ParameterNames.PAGE, page);
 				SetAttribute.setOthers(request, AttributeNames.TOTAL_PAGES, totalPages);
 				SetAttribute.setOthers(request, AttributeNames.FIRST_PAGED_PAGE, firstPagedPage);
@@ -636,7 +639,7 @@ public class ProductoServlet extends HttpServlet {
 							quantity = cartLines.get(index).getQuantity();
 							total = total-g.getPrecio()*quantity;
 							shippingCost = shippingCost-quantity*0.5;
-							cartLines.remove(index);
+							cartLines.remove(scl);
 						}
 					}
 					
@@ -703,6 +706,8 @@ public class ProductoServlet extends HttpServlet {
 				target = ControllerPaths.NO_CONTEXT_PRODUCTO.concat("?").concat(ParameterNames.ACTION)
 							.concat("=").concat(Actions.BUY);
 				redirect = true;
+			} else {
+				target = ViewPaths.CART;
 			}
 		}
 		
@@ -750,6 +755,8 @@ public class ProductoServlet extends HttpServlet {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					redirect = true;
+					target = ViewPaths.HOME;
 				}
 			}
 		}

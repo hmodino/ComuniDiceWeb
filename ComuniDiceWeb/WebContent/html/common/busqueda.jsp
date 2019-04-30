@@ -11,7 +11,7 @@
 				<p><fmt:message key="producto" bundle="${messages}"/></p>
 			<input type="radio" id="usuarioCheck" name=<%=ParameterNames.ACTION%> value="<%=Actions.SEARCH_USERS%>">
 				<p><fmt:message key="usuario" bundle="${messages}"/></p>
-			<div id="hiddenUsuario">
+			<div id="hiddenUsuario"><br>
 				<input type="radio" name="<%=ParameterNames.SEARCH_BY %>" value="<%=ParameterNames.EMAIL%>">
 					<p><fmt:message key="email" bundle="${messages}"/></p>
 				<input type="radio" name="<%=ParameterNames.SEARCH_BY %>" value="<%=ParameterNames.USER_NAME%>" checked="checked">

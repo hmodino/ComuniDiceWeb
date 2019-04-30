@@ -13,8 +13,6 @@
 			<div class="resultado">
 				<a href="${urlDetailView}">${result.nombreUsuario}</a>
 				<p>${result.descripcion}</p>
-				<a href="${urlAdd}">
-					<img src="<%=request.getContextPath()%>/imgs/addFriendButton.jpg" width="30px" height="30px" alt="addFriend"></a>
 			</div>
 		</div>
 	</c:if>

@@ -18,27 +18,9 @@
 		<p>${result.fechaEntrada}</p>
 		<p>${result.stock}</p>
 		<p>${result.valoracion}</p>
-		<c:if test="${not empty result.comentarios}">
-			<div id="comentarios">
-			<c:forEach items="${result.comentarios}" var="c">
-				<div id="comentario">
-					<p>${c.nombreUsuario}</p>
-					<p>${c.fecha}</p>
-					<p>${c.contenido}</p>
-					<c:if test="${c.usuario eq user.idUsuario}">
-						<c:url var="deleteComment" scope="page" value="producto">
-							<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.DELETE_COMMENT%>"/>
-							<c:param name="<%=ParameterNames.ID %>" value="${c.idComentario}"/>
-						</c:url>
-						<a href="${deleteComment}"><fmt:message key="eliminar" bundle="${messages}"/></a>
-					</c:if>
-				</div>
-			</c:forEach>
-			</div>
-		</c:if>
-		<p><a href="${fav}"><fmt:message key="favorito" bundle="${messages}"/></a></p>
-		<p><a href="${cart}"><fmt:message key="anadirCarrito" bundle="${messages}"/></a></p>
-		<p><fmt:message key="valoracion" bundle="${messages}"/></p>
+		<a href="${fav}"><fmt:message key="favorito" bundle="${messages}"/></a>
+		<a href="${cart}"><fmt:message key="anadirCarrito" bundle="${messages}"/></a>
+		<fmt:message key="valoracion" bundle="${messages}"/>
 		<form action="<%=ControllerPaths.PRODUCTO %>" method="post">
 			<input type="hidden" name="<%=ParameterNames.ACTION%>" value="<%=Actions.FAVOURITE%>"/>
 			<input type="hidden" name="<%=ParameterNames.ID%>" value="${result.idProducto}"/>
@@ -56,11 +38,28 @@
 				<option value="5.0">5</option>
 			</select>
 		</form>
+		<c:if test="${not empty result.comentarios}">
+			<c:forEach items="${result.comentarios}" var="c">
+				<div class="resultadoSinFondo">
+					<p>${c.nombreUsuario}</p>
+					<p>${c.fecha}</p>
+					<p>${c.contenido}</p>
+					<c:if test="${c.usuario eq user.idUsuario}">
+						<c:url var="deleteComment" scope="page" value="producto">
+							<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.DELETE_COMMENT%>"/>
+							<c:param name="<%=ParameterNames.ID %>" value="${c.idComentario}"/>
+						</c:url>
+						<a href="${deleteComment}"><fmt:message key="eliminar" bundle="${messages}"/></a>
+					</c:if>
+				</div>
+			</c:forEach>
+		</c:if>
 		<form action="<%=ControllerPaths.PRODUCTO %>" method="post">
 			<input type="hidden" name="<%=ParameterNames.ACTION %>" value="<%=Actions.CREATE_COMMENT %>"/>
 			<input type="hidden" name="<%=ParameterNames.ID%>" value="${result.idProducto}"/>
-			<textarea rows="25" cols="100" name="<%=ParameterNames.CONTENT%>"></textarea>
-			<input type="submit" value="<fmt:message key="enviar" bundle="${messages}"/>"/>
+			<textarea rows="10" cols="75" name="<%=ParameterNames.CONTENT%>"></textarea>
+			<input id="enviarComentario" type="submit" value="<fmt:message key="enviar" bundle="${messages}"/>"/>
 		</form>
 	</div>
 </c:if>
+<%@include file="/html/common/footer.jsp"%>

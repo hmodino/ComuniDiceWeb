@@ -2,7 +2,7 @@
 	<div id="edicionPerfil" class="content">
 		<form action="<%=ControllerPaths.USUARIO%>" method="post">
 			<div id="edicionDatos">
-				<h1><fmt:message key="datosPersonales" bundle="${messages}"/></h1>
+				<h1><fmt:message key="datosPersonales" bundle="${messages}"/></h1><br>
 				<input type="hidden" name="<%=ParameterNames.ACTION%>" value="<%=Actions.EDIT%>"/>
 				
 				<input type="text" name="<%=ParameterNames.NAME%>" 
@@ -26,7 +26,7 @@
 					value="${sessionScope['user'].telefono}" placeholder="<fmt:message key="telefono" bundle="${messages}"/>">
 			</div>
 			<div id="edicionDireccion">	
-				<h1><fmt:message key="direccion" bundle="${messages}"/></h1>
+				<h1><fmt:message key="direccion" bundle="${messages}"/></h1><br>
 					
 				<input type="text" name="<%=ParameterNames.MUNICIPALITY%>" placeholder="<fmt:message key="municipio" bundle="${messages}"/>">
 						
