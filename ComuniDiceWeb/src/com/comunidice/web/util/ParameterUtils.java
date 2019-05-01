@@ -1,5 +1,6 @@
 package com.comunidice.web.util;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,85 +13,69 @@ public class ParameterUtils {
 		
 		StringBuilder criteria = null;
 		String s = null;
+		Map<String, String> urlMap = new HashMap<String, String>();
 		
-		criteria = new StringBuilder();
-		
-		criteria.append(ControllerPaths.PRODUCTO).append("?").append(ParameterNames.ACTION).append("=")
-			.append(Actions.SEARCH_PRODUCTS).append("&").append(ParameterNames.DEFAULT).append("=")
-			.append(defaultSearch.toString());
+		urlMap.put(ParameterNames.ACTION, Actions.SEARCH_PRODUCTS);
+		urlMap.put(ParameterNames.DEFAULT, defaultSearch.toString());
 	
 		if(c.getIdCategoria()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(c.getIdCategoria().toString());
-			criteria.append(ParameterNames.CATEGORY_ID).append("=").append(s);
+			urlMap.put(ParameterNames.CATEGORY_ID, s);
 		}
 		if(c.getNombre()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(c.getNombre());
-			criteria.append(ParameterNames.NAME).append("=").append(s);
+			urlMap.put(ParameterNames.NAME, s);
 		}
 		if(c.getPrecioDesde()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(c.getPrecioDesde().toString());
-			criteria.append(ParameterNames.MIN_PRICE).append("=").append(s);
+			urlMap.put(ParameterNames.MIN_PRICE, s);
 		}
 		if(c.getPrecioHasta()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(c.getPrecioHasta().toString());
-			criteria.append(ParameterNames.MAX_PRICE).append("=").append(s);
+			urlMap.put(ParameterNames.MAX_PRICE, s);
 		}
 		if(c.getFechaMinima()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(ValidationUtils.dateToString(c.getFechaMinima()));
-			criteria.append(ParameterNames.MIN_DATE).append("=").append(s);
+			urlMap.put(ParameterNames.MIN_DATE, s);
 		}
 		if(c.getFechaMaxima()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(ValidationUtils.dateToString(c.getFechaMaxima()));
-			criteria.append(ParameterNames.MAX_DATE).append("=").append(s);
+			urlMap.put(ParameterNames.MAX_DATE, s);
 		}
 		if(c.getNumeroFavoritos()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(c.getNumeroFavoritos().toString());
-			criteria.append(ParameterNames.FAVS).append("=").append(s);
+			urlMap.put(ParameterNames.FAVS, s);
 		}
 		if(c.getValoracion()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(c.getValoracion().toString());
-			criteria.append(ParameterNames.RATING).append("=").append(s);
+			urlMap.put(ParameterNames.RATING, s);
 		}
 		if(c.getIdVendedor()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(c.getIdVendedor().toString());
-			criteria.append(ParameterNames.SELLER_ID).append("=").append(s);
+			urlMap.put(ParameterNames.SELLER_ID, s);
 		}
 		if(c.getTipoVendedor()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(c.getTipoVendedor().toString());
-			criteria.append(ParameterNames.SELLER_TYPE).append("=").append(s);
+			urlMap.put(ParameterNames.SELLER_TYPE, s);
 		}
 		if(c.getAnhoPublicacionMinimo()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(c.getAnhoPublicacionMinimo().toString());
-			criteria.append(ParameterNames.MIN_PUBLICATION_YEAR).append("=").append(s);
+			urlMap.put(ParameterNames.MIN_PUBLICATION_YEAR, s);
 		}
 		if(c.getAnhoPublicacionMaximo()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(c.getAnhoPublicacionMaximo().toString());
-			criteria.append(ParameterNames.MAX_PUBLICATION_YEAR).append("=").append(s);
+			urlMap.put(ParameterNames.MAX_PUBLICATION_YEAR, s);
 		}
 		if(c.getFormato()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(c.getFormato().toString());
-			criteria.append(ParameterNames.FORMAT).append("=").append(s);
+			urlMap.put(ParameterNames.FORMAT, s);
 		}
 		if(c.getTipoTapa()!=null) {
-			criteria.append("&");
 			s = ValidationUtils.isEmpty(c.getTipoTapa().toString());
-			criteria.append(ParameterNames.COVER_TYPE).append("=").append(s);
+			urlMap.put(ParameterNames.COVER_TYPE, s);
 		}
 		
-		s = criteria.toString();
+		s = ParameterUtils.URLBuilder(ControllerPaths.PRODUCTO, urlMap);
 		return s;
 	}
 	

@@ -33,4 +33,5 @@ public interface Actions {
 	public static final String MODIFY_QUANTITY = "modifyQuantity";
 	public static final String PRE_BUY = "preBuy";
 	public static final String BUY = "buy";
+	public static final String DOWNLOAD = "download";
 }

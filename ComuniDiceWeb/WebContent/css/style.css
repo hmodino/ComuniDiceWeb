@@ -171,7 +171,7 @@ textarea{
 	margin-right:auto;
 }
 
-#descripcion, #precio, #fechaEntrada, #valoracion, #anhoPublicacion, #formato, #paginas, #tipoTapa, #comentarios{
+#descripcion, #precio, #fechaEntrada, #valoracion, #anhoPublicacion, #formato, #paginas, #tipoTapa, #comentarios #descargas{
 	color:#000000;
 	font-size:1.1em;
 }

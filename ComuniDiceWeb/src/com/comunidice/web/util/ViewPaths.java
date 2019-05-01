@@ -19,5 +19,6 @@ public interface ViewPaths {
 	public static final String PRODUCT_DETAIL = "/html/producto-detalle-page.jsp";
 	public static final String CART = "/html/carrito-page.jsp";
 	public static final String BUY = "/html/compra-page.jsp";
+	public static final String DOWNLOAD = "/html/descarga-page.jsp";
 	
 }

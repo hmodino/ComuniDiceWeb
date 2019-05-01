@@ -1,7 +1,8 @@
 package com.comunidice.web.servlet;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,15 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import com.comunidice.web.util.Actions;
 import com.comunidice.web.util.ControllerPaths;
 import com.comunidice.web.util.ParameterNames;
+import com.comunidice.web.util.ParameterUtils;
 import com.comunidice.web.util.RedirectOrForward;
-import com.comunidice.web.util.SetAttribute;
 import com.comunidice.web.util.ValidationUtils;
-import com.comunidice.web.util.ViewPaths;
-import com.rollanddice.comunidice.exception.DataException;
-import com.rollanddice.comunidice.exception.ServiceException;
-import com.rollanddice.comunidice.model.Categoria;
-import com.rollanddice.comunidice.service.impl.CategoriaServiceImpl;
-import com.rollanddice.comunidice.service.spi.CategoriaService;
 
 @WebServlet("/search")
 public class SearchServlet extends HttpServlet {
@@ -35,22 +30,31 @@ public class SearchServlet extends HttpServlet {
 		String target = null;
 		String defaultSearch = null;
 		String url = ValidationUtils.parameterIsEmpty(request, ParameterNames.URL);
+		Map <String, String> urlMap = null;
 		
 		if(Actions.SEARCH_USERS.equalsIgnoreCase(action)) {
-			target = ControllerPaths.NO_CONTEXT_USUARIO.concat("?").concat(ParameterNames.ACTION).concat("=").concat(Actions.SEARCH_USERS);
+			urlMap = new HashMap<String, String>();
+			urlMap.put(ParameterNames.ACTION, Actions.SEARCH_USERS);
+			target = ParameterUtils.URLBuilder(ControllerPaths.NO_CONTEXT_USUARIO, urlMap);
 		}
 		else if(Actions.SEARCH_PRODUCTS.equalsIgnoreCase(action)) {
+			
 			if(url==null) {
-				target = ControllerPaths.NO_CONTEXT_PRODUCTO.concat("?").concat(ParameterNames.ACTION).concat("=").concat(Actions.SEARCH_PRODUCTS)
-					.concat("&").concat(ParameterNames.DEFAULT).concat("=").concat("false");
+				urlMap = new HashMap<String, String>();
+				urlMap.put(ParameterNames.ACTION, Actions.SEARCH_PRODUCTS);
+				urlMap.put(ParameterNames.DEFAULT, "false");
+				target = ParameterUtils.URLBuilder(ControllerPaths.NO_CONTEXT_PRODUCTO, urlMap);
 			} else {
 				target = url;
 			}
 		} else if(!Actions.SEARCH_USERS.equalsIgnoreCase(action)
 				&& !Actions.SEARCH_USERS.equalsIgnoreCase(action)) {
-			defaultSearch = ParameterNames.RATING.concat("=").concat("2");
-			target = ControllerPaths.NO_CONTEXT_PRODUCTO.concat("?").concat(ParameterNames.ACTION).concat("=").concat(Actions.SEARCH_PRODUCTS)
-					.concat("&").concat(ParameterNames.DEFAULT).concat("=").concat("true").concat(defaultSearch);
+			
+			urlMap = new HashMap<String, String>();
+			urlMap.put(ParameterNames.ACTION, Actions.SEARCH_PRODUCTS);
+			urlMap.put(ParameterNames.DEFAULT, "true");
+			urlMap.put(ParameterNames.CATEGORY_ID, "3");
+			target = ParameterUtils.URLBuilder(ControllerPaths.NO_CONTEXT_PRODUCTO, urlMap);
 		}
 		RedirectOrForward.send(request, response, false, target, true);
 	}

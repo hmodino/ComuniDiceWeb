@@ -3,7 +3,9 @@ package com.comunidice.web.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -55,7 +57,7 @@ import com.rollanddice.comunidice.service.spi.ProductoService;
 
 @WebServlet("/producto")
 public class ProductoServlet extends HttpServlet {
-	
+
 	private static int count = Integer.valueOf(
 			ConfigurationManager.getInstance().getParameter(
 					ConfigurationParameterNames.RESULTS_PAGE_SIZE_DEFAULT)); 
@@ -63,23 +65,23 @@ public class ProductoServlet extends HttpServlet {
 	private static int pagingPageCount = Integer.valueOf(
 			ConfigurationManager.getInstance().getParameter(
 					ConfigurationParameterNames.RESULTS_PAGING_PAGE_COUNT)); 
-	
+
 	private static Logger logger = LogManager.getLogger(ProductoServlet.class);
 	private static ProductoService service = null;
 	private static ComentarioService commentService = null;
 	private static FavoritoService favouriteService = null;
 	private static CompraService buyService = null;
-	
-    public ProductoServlet() {
-        super();
-        service = new ProductoServiceImpl();
-        commentService = new ComentarioServiceImpl();
-        favouriteService = new FavoritoServiceImpl();
-        buyService = new CompraServiceImpl();
-    }
+
+	public ProductoServlet() {
+		super();
+		service = new ProductoServiceImpl();
+		commentService = new ComentarioServiceImpl();
+		favouriteService = new FavoritoServiceImpl();
+		buyService = new CompraServiceImpl();
+	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+
 		Errors errors = new Errors();
 		Producto p = null;
 		Juego g = null;
@@ -91,7 +93,7 @@ public class ProductoServlet extends HttpServlet {
 		ShoppingCartLine cartLine = null;
 		Compra buy = null;
 		LineaCompra buyLine = null;
-		
+
 		Results<Producto> products = null;
 		Results<Juego> games = null;
 		List<Juego> gs = null;
@@ -99,9 +101,9 @@ public class ProductoServlet extends HttpServlet {
 		List<ShoppingCartLine> cartLines = null;
 		List<LineaCompra> buyLines = null;
 		List<Results> results = null;
-		
+
 		String action = ValidationUtils.parameterIsEmpty(request, ParameterNames.ACTION);
-		
+
 		Integer id = null;
 		String language = null;
 		Integer categoryId = null;
@@ -135,18 +137,22 @@ public class ProductoServlet extends HttpServlet {
 		Date expireDate = null;
 		Boolean defaultSearch = null;
 		Integer fav = null;
-		
+		String buyLink = null;
+
+		List<String> buyLinks = null;
+		Map<String, String> urlMap = null;
+
 		String url = null;
 		String target = null;
 		Boolean redirect = false;
 		Boolean send = true;
-		
+
 		Boolean game = null;
-		
+
 		if(Actions.SEARCH_PRODUCTS.equalsIgnoreCase(action)) {
-		
+
 			c = new Criteria();
-			
+
 			categoryId = ValidationUtils.parseIntParameter(request, ParameterNames.CATEGORY_ID);
 			name = ValidationUtils.parameterIsEmpty(request, ParameterNames.NAME);
 			if(name==null) {
@@ -164,12 +170,12 @@ public class ProductoServlet extends HttpServlet {
 			maxPublicationYear = ValidationUtils.parseIntParameter(request, ParameterNames.MAX_PUBLICATION_YEAR);
 			format = ValidationUtils.parseIntParameter(request, ParameterNames.FORMAT);
 			coverType = ValidationUtils.parseIntParameter(request, ParameterNames.COVER_TYPE);
-			
+
 			page = WebUtils.getPage(request, ParameterNames.PAGE);
 			startIndex = (page-1)*count+1;
-			
+
 			language = SessionManager.get(request, WebConstants.USER_LOCALE).toString();
-			
+
 			defaultSearch = ValidationUtils.parseBooleanParameter(request, ParameterNames.DEFAULT);
 
 			if(categoryId!=null) {
@@ -214,7 +220,7 @@ public class ProductoServlet extends HttpServlet {
 			if(coverType!=null) {
 				c.setTipoTapa(coverType);
 			}
-			
+
 			game = SelectClass.game(c);
 
 			if(game) {
@@ -225,7 +231,7 @@ public class ProductoServlet extends HttpServlet {
 					gs = games.getPage();
 					total = Math.ceil((double)games.getTotal());
 					totalPages = (int) Math.ceil((double)games.getTotal()/(double)count);
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 					errors.add(ParameterNames.GAME, ErrorCodes.NOT_FOUND_OBJECT);
@@ -245,7 +251,7 @@ public class ProductoServlet extends HttpServlet {
 			if(errors.hasErrors()) {
 				target = ViewPaths.HOME;
 				redirect = true;
-				
+
 				SetAttribute.setErrors(request, errors);
 			}else {
 				if(defaultSearch==true) {
@@ -271,11 +277,11 @@ public class ProductoServlet extends HttpServlet {
 				SetAttribute.setOthers(request, AttributeNames.URL, url);
 			}
 		}
-		
+
 		else if(Actions.DETAIL_VIEW.equalsIgnoreCase(action)) {
-			
+
 			language = SessionManager.get(request, WebConstants.USER_LOCALE).toString();
-			
+
 			id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 
 			if(id!=null) {
@@ -285,7 +291,7 @@ public class ProductoServlet extends HttpServlet {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			 if(g==null) {
+				if(g==null) {
 					try {
 						p = service.findById(id, language);
 						game = false;
@@ -313,17 +319,17 @@ public class ProductoServlet extends HttpServlet {
 				redirect = false;
 			}
 		}
-		
+
 		else if(Actions.CREATE_COMMENT.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			
+
 			id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 			content = ValidationUtils.parameterIsEmpty(request, ParameterNames.CONTENT);
-			
+
 			if(u!=null) {
 				comment = new Comentario();
-				
+
 				if(id!=null && content!=null) {
 					comment.setProducto(id);
 					comment.setContenido(content);
@@ -344,7 +350,7 @@ public class ProductoServlet extends HttpServlet {
 				}
 			}else {
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
-				target = ViewPaths.HOME;
+				target = ViewPaths.LOGIN;
 				redirect = false;
 			}
 			if(errors.hasErrors()) {
@@ -358,9 +364,9 @@ public class ProductoServlet extends HttpServlet {
 				send = false;
 			}
 		}
-		
+
 		else if(Actions.DELETE_COMMENT.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			if(u!=null) {
 				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
@@ -376,7 +382,7 @@ public class ProductoServlet extends HttpServlet {
 				}
 			} else {
 				errors.add(ParameterNames.USER, ErrorCodes.NOT_FOUND_OBJECT);
-				target = ViewPaths.HOME;
+				target = ViewPaths.LOGIN;
 			}
 			if(errors.hasErrors()) {
 				if(target==null) {
@@ -389,11 +395,11 @@ public class ProductoServlet extends HttpServlet {
 				send = false;
 			}
 		}
-		
+
 		else if(Actions.FAVOURITE.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);			
-						
+
 			if(u!=null) {
 				f = new Favorito();
 				userId = u.getIdUsuario();
@@ -421,7 +427,7 @@ public class ProductoServlet extends HttpServlet {
 						if(favourite) {
 							if(exist.getFavorito()) {
 								fav = 0;
-								
+
 							} else {
 								fav = 1;
 							}
@@ -450,25 +456,25 @@ public class ProductoServlet extends HttpServlet {
 				redirect = true;
 			}
 		}
-		
+
 		else if(Actions.ADD_TO_CART.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			 
+
 			if(u!=null) {
 				cart = (ShoppingCart) SessionManager.get(request, AttributeNames.SHOPPING_CART);
 				if(cart == null) {
 					cart = new ShoppingCart();
 				}
-				
+
 				cartLines = cart.getLine();
-				 
+
 				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 				if(id!=null) {
 					try {
 						g = service.findJuegoById(id);
 					} catch(Exception e) {
-						 
+
 					}
 					if(g == null) {
 						language = SessionManager.get(request, WebConstants.USER_LOCALE).toString();
@@ -478,10 +484,10 @@ public class ProductoServlet extends HttpServlet {
 							errors.add(ParameterNames.PRODUCT, ErrorCodes.FINDER_ERROR);
 						}
 						if(p!=null && !errors.hasErrors()) {
-							
+
 							total = cart.getTotal();
 							shippingCost = cart.getShippingCosts();
-							
+
 							if(cartLines!=null) {
 								ShoppingCartLine scl = new ShoppingCartLine();
 								scl.setProduct(p);
@@ -520,7 +526,7 @@ public class ProductoServlet extends HttpServlet {
 					} if (g!=null && !errors.hasErrors()){
 						total = cart.getTotal();
 						shippingCost = cart.getShippingCosts();
-						
+
 						if(cartLines!=null) {
 							ShoppingCartLine scl = new ShoppingCartLine();
 							scl.setProduct(g);
@@ -584,22 +590,22 @@ public class ProductoServlet extends HttpServlet {
 				redirect = true;
 			}
 		}
-		
+
 		else if(Actions.REMOVE_FROM_CART.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			 
+
 			if(u!=null) {
 				cart = (ShoppingCart) SessionManager.get(request, AttributeNames.SHOPPING_CART);
 
 				cartLines = cart.getLine();
-				 
+
 				id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 				if(id!=null && cartLines!=null) {
 					try {
 						g = service.findJuegoById(id);
 					} catch(Exception e) {
-						 
+
 					}
 					if(g == null) {
 						language = SessionManager.get(request, WebConstants.USER_LOCALE).toString();
@@ -640,7 +646,7 @@ public class ProductoServlet extends HttpServlet {
 							cartLines.remove(scl);
 						}
 					}
-					
+
 					if(!errors.hasErrors()) {
 						cart.setTotal(total);
 						cart.setShippingCosts(shippingCost);
@@ -656,28 +662,32 @@ public class ProductoServlet extends HttpServlet {
 			}
 			send = false;
 		}
-		
+
 		else if(Actions.CLEAR_CART.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
-			 
+
 			if(u!=null) {
 				cart = new ShoppingCart();
 				SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
+				send = false;
+			} else {
+				target = ViewPaths.LOGIN;
+				redirect = true;
 			}
-			send = false;
-		}
-		
-		else if(Actions.MODIFY_QUANTITY.equalsIgnoreCase(action)) {
 			
+		}
+
+		else if(Actions.MODIFY_QUANTITY.equalsIgnoreCase(action)) {
+
 			u = (Usuario)SessionManager.get(request, AttributeNames.USER);
 			send = false;
 			if(u!=null) {
-				
+
 				cart = (ShoppingCart) SessionManager.get(request, AttributeNames.SHOPPING_CART);
 
 				cartLines = cart.getLine();
-				
+
 				index = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
 				if(index!=null) {
 					quantity = ValidationUtils.parseIntParameter(request, ParameterNames.QUANTITY);
@@ -690,32 +700,46 @@ public class ProductoServlet extends HttpServlet {
 							send = true;
 						}
 					}
-				SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
-				}
+					SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
+					send = false;
+				} 
+			} else {
+				target = ViewPaths.LOGIN;
+				redirect = true;
 			}
 		}
-		
+
 		else if(Actions.PRE_BUY.equalsIgnoreCase(action)) {
 			
-			cardNumber = ValidationUtils.parameterIsEmpty(request, ParameterNames.CARD_NUMBER);
-			expireDate = ValidationUtils.dateFormat(ValidationUtils.getParameter(request, ParameterNames.EXPIRE_DATE));
+			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
 			
-			if(PagoServiceMock.check(cardNumber, expireDate)) {
-				target = ControllerPaths.NO_CONTEXT_PRODUCTO.concat("?").concat(ParameterNames.ACTION)
-							.concat("=").concat(Actions.BUY);
-				redirect = true;
+			if(u!=null) {
+				cardNumber = ValidationUtils.parameterIsEmpty(request, ParameterNames.CARD_NUMBER);
+				expireDate = ValidationUtils.dateFormat(ValidationUtils.getParameter(request, ParameterNames.EXPIRE_DATE));
+	
+				if(PagoServiceMock.check(cardNumber, expireDate)) {
+					urlMap = new HashMap<String, String>();
+					urlMap.put(ParameterNames.ACTION, Actions.BUY);
+					target = ParameterUtils.URLBuilder(ControllerPaths.NO_CONTEXT_PRODUCTO, urlMap);
+					redirect = true;
+				} else {
+					target = ViewPaths.CART;
+				}
 			} else {
-				target = ViewPaths.CART;
+				target = ViewPaths.LOGIN;
+				redirect = true;
 			}
 		}
-		
+
 		else if(Actions.BUY.equalsIgnoreCase(action)) {
-			
+
 			u = (Usuario)SessionManager.get(request, AttributeNames.USER);
-			
+
 			if(u!= null) {
 				cart = (ShoppingCart)SessionManager.get(request, AttributeNames.SHOPPING_CART);
 				if(cart!=null) {
+					buyLinks = new ArrayList<String>();
+					urlMap = new HashMap<String, String>();
 					cartLines = cart.getLine();
 					for(ShoppingCartLine line:cartLines) {
 						game = line.getGame();
@@ -723,6 +747,10 @@ public class ProductoServlet extends HttpServlet {
 							g = (Juego) line.getProduct();
 							id = g.getIdProducto();
 							total = g.getPrecio();
+							urlMap.put(ParameterNames.ACTION, Actions.DOWNLOAD);
+							urlMap.put(ParameterNames.ID, id.toString());
+							buyLink = ParameterUtils.URLBuilder(ControllerPaths.PRODUCTO, urlMap);
+							buyLinks.add(buyLink);
 						} else {
 							p = (Producto) line.getProduct();
 							id = p.getIdProducto();
@@ -750,16 +778,41 @@ public class ProductoServlet extends HttpServlet {
 					try {
 						buyService.create(buy, buyLines);
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
+						
 						e.printStackTrace();
 					}
-					redirect = true;
-					target = ViewPaths.HOME;
+				} else {
+					errors.add(ParameterNames.CART, ErrorCodes.MANDATORY_PARAMETER);
 				}
+				if(errors.hasErrors()) {
+					target = ViewPaths.HOME;
+					redirect = true;
+				} else {
+					SetAttribute.setOthers(request, ParameterNames.URL_DOWNLOAD, buyLinks);
+					redirect = false;
+					target = ViewPaths.DOWNLOAD;
+				}
+			} else {
+				target = ViewPaths.LOGIN;
+				redirect = true;
+			}
+		}
+
+		else if(Actions.DOWNLOAD.equalsIgnoreCase(action)) {
+
+			u = (Usuario) SessionManager.get(request, AttributeNames.USER);
+
+			if(u!=null) {
+				name = ValidationUtils.parameterIsEmpty(request, ParameterNames.ID);
+				FileUtils.readDocument(response, name);
+				return;
+			} else {
+				target = ViewPaths.LOGIN;
+				redirect = true;
 			}
 		}
 		RedirectOrForward.send(request, response, redirect, target, send);
-		
+
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

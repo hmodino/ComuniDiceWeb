@@ -57,6 +57,7 @@ public interface ParameterNames {
 	public static final String FALSE = "false";
 	public static final String QUANTITY = "quantity";
 	public static final String TOTAL = "total";
+	public static final String CART = "cart";
 	
 	public static final String SEARCH_TYPE = "searchType";
 	public static final String SEARCH_USER = "searchUser";
@@ -67,4 +68,5 @@ public interface ParameterNames {
 	public static final String INDEX = "index";
 	public static final String DEFAULT = "default";
 	public static final String URL = "url";
+	public static final String URL_DOWNLOAD = "urlDownload";
 }
