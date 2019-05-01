@@ -1,7 +1,7 @@
 <%@include file="/html/common/header.jsp"%>
 <div id="perfilUsuario" class="content">
 	<c:if test="${not empty sessionScope['user']}">
-		<a href="/ComuniDiceWeb<%=ViewPaths.EDIT_PROFILE%>"><h1><fmt:message key="editarPerfil" bundle="${messages}"/></h1></a>
+		<a href="/ComuniDiceWeb<%=ViewPaths.EDIT_PROFILE%>"><fmt:message key="editarPerfil" bundle="${messages}"/></a>
 		<div id="perfilFondo">
 		<p>${sessionScope['user'].nombreUsuario}</p>
 		<p>${sessionScope['user'].descripcion}</p>

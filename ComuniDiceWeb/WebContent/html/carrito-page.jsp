@@ -25,8 +25,8 @@
 						<p><a href="${remove}"><fmt:message key="eliminar" bundle="${messages}"/></a></p>
 					</div>
 				</c:forEach>
-				<p>${sessionScope['shoppingCart'].shippingCosts}</p>
-				<p>${sessionScope['shoppingCart'].total}</p>
+				<p><fmt:message key="costesEnvio" bundle="${messages}"/>${sessionScope['shoppingCart'].shippingCosts}</p>
+				<p><fmt:message key="total" bundle="${messages}"/>${sessionScope['shoppingCart'].total}</p>
 				<p><a href="/ComuniDiceWeb<%=ViewPaths.BUY%>"><fmt:message key="comprar" bundle="${messages}"/></a></p>
 				<p><a href="${clear}"><fmt:message key="vaciar" bundle="${messages}"/></a></p>
 			</div>

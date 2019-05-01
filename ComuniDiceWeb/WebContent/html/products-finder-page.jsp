@@ -21,7 +21,6 @@
 							<c:param name="<%=ParameterNames.ID %>" value="${r.idProducto}"/>
 						</c:url>			
 						<a href="${urlDetail}">${r.nombre}</a>	
-						<p>${r.descripcion}</p>		
 					</div>
 				</c:forEach>
 			
@@ -71,7 +70,7 @@
 				&nbsp;&nbsp;<a href="${url}&page=${totalPages}"><fmt:message key="ultima" bundle="${messages}"/></a>
 			</c:if>		
 		
-			</center></p>
+			</center>
 			
 		</c:if>
 	</div>

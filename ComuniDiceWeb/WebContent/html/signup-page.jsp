@@ -14,6 +14,8 @@
 			<input type="text" name="<%=ParameterNames.SURNAME2%>" placeholder="<fmt:message key="apellido" bundle="${messages}"/>">
 				
 			<input type="text" name="<%=ParameterNames.USER_NAME%>" placeholder="<fmt:message key="nombreUsuario" bundle="${messages}"/>">
+			
+			<input type="text" name="<%=ParameterNames.EMAIL%>" placeholder="<fmt:message key="email" bundle="${messages}"/>">
 				
 			<input type="password" name="<%=ParameterNames.PASSWORD%>" placeholder="<fmt:message key="contrasena" bundle="${messages}"/>">
 				
@@ -33,6 +35,7 @@
 				</c:if>
 			</select>
 		<select name="regions" id="regions">
+		<option value=""><fmt:message key="seleccionRegion" bundle="${messages}"/></option>
 		<c:forEach items="${regions}" var="rg" >
 			<option value="${rg.getIdRegion()}">${rg.getNombre()}</option>
 		</c:forEach>
@@ -41,7 +44,7 @@
 				
 			<input type="text" name="<%=ParameterNames.LOCALITY%>" placeholder="<fmt:message key="localidad" bundle="${messages}"/>">
 				
-			<input type=text name="<%=ParameterNames.CP%>" placeholder="<fmt:message key="codigoPostal" bundle="${messages}"/>">
+			<input type=text name="<%=ParameterNames.CP%>" placeholder="<fmt:message key="cp" bundle="${messages}"/>">
 				
 			<input type="text" name="<%=ParameterNames.STREET%>" placeholder="<fmt:message key="calle" bundle="${messages}"/>">
 				

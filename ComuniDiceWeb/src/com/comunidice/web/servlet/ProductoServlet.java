@@ -24,6 +24,7 @@ import com.comunidice.web.util.ConfigurationManager;
 import com.comunidice.web.util.ConfigurationParameterNames;
 import com.comunidice.web.util.ControllerPaths;
 import com.comunidice.web.util.ErrorCodes;
+import com.comunidice.web.util.FileUtils;
 import com.comunidice.web.util.ParameterNames;
 import com.comunidice.web.util.ParameterUtils;
 import com.comunidice.web.util.RedirectOrForward;
@@ -160,9 +161,7 @@ public class ProductoServlet extends HttpServlet {
 			sellerId = ValidationUtils.parseIntParameter(request, ParameterNames.SELLER_ID);
 			sellerType = ValidationUtils.parseIntParameter(request, ParameterNames.SELLER_TYPE);
 			minPublicationYear = ValidationUtils.parseIntParameter(request, ParameterNames.MIN_PUBLICATION_YEAR);
-			maxPublicationYear = ValidationUtils.parseInt(
-						ValidationUtils.dateToString(
-								ValidationUtils.parameterDateFormat(request, ParameterNames.MAX_PUBLICATION_YEAR)));
+			maxPublicationYear = ValidationUtils.parseIntParameter(request, ParameterNames.MAX_PUBLICATION_YEAR);
 			format = ValidationUtils.parseIntParameter(request, ParameterNames.FORMAT);
 			coverType = ValidationUtils.parseIntParameter(request, ParameterNames.COVER_TYPE);
 			
@@ -278,16 +277,18 @@ public class ProductoServlet extends HttpServlet {
 			language = SessionManager.get(request, WebConstants.USER_LOCALE).toString();
 			
 			id = ValidationUtils.parseIntParameter(request, ParameterNames.ID);
-			
+
 			if(id!=null) {
 				try {
 					g = service.findJuegoById(id);
+					game = true;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				if(g == null) {
+			 if(g==null) {
 					try {
 						p = service.findById(id, language);
+						game = false;
 					} catch (Exception e) {
 						e.printStackTrace();
 						errors.add(ParameterNames.PRODUCT, ErrorCodes.FINDER_ERROR);
@@ -308,6 +309,7 @@ public class ProductoServlet extends HttpServlet {
 					SetAttribute.setResult(request, p);
 					target = ViewPaths.PRODUCT_DETAIL;
 				}
+				SetAttribute.setOthers(request, ParameterNames.GAME, game);
 				redirect = false;
 			}
 		}
@@ -490,16 +492,11 @@ public class ProductoServlet extends HttpServlet {
 									quantity++;
 									cartLine.setQuantity(quantity);
 									if(total!=null) {
-										total = total+p.getPrecio();
+										total = total-cart.getShippingCosts()+p.getPrecio();
 									} else {
 										total = p.getPrecio()*quantity;
 									}
-									if(shippingCost==null) {
-										shippingCost = quantity*0.5;
-									}
-									else {
-										shippingCost = shippingCost+0.5;
-									}
+									shippingCost = 0.5;
 								}
 							} 
 							if(index == null || index == -1){
@@ -512,17 +509,12 @@ public class ProductoServlet extends HttpServlet {
 								cartLine.setQuantity(quantity);
 								cartLine.setGame(false);
 								cartLines.add(cartLine);
-								if(total!=null) {
-									total = total+p.getPrecio()*quantity;
-								} else {
+								if(total==null) {
 									total = p.getPrecio()*quantity;
+								} else {
+									total = total-cart.getShippingCosts()+p.getPrecio();
 								}
-								if(shippingCost==null) {
-									shippingCost = quantity*0.5;
-								}
-								else {
-									shippingCost = shippingCost+0.5;
-								}
+								shippingCost = quantity*0.5;
 							}
 						}
 					} if (g!=null && !errors.hasErrors()){
@@ -539,15 +531,14 @@ public class ProductoServlet extends HttpServlet {
 								quantity++;
 								cartLine.setQuantity(quantity);
 								if(total!=null) {
-									total = total+g.getPrecio();
+									total = total-cart.getShippingCosts()+g.getPrecio();
 								} else {
 									total = g.getPrecio()*quantity;
 								}
-								if(shippingCost==null) {
-									shippingCost = quantity*0.5;
-								}
-								else {
-									shippingCost = shippingCost+0.5;
+								if(g.getFormato().equals(0)){
+									shippingCost = 0.5;
+								} else {
+									shippingCost = 0.0;
 								}
 							}
 						} 
@@ -559,26 +550,29 @@ public class ProductoServlet extends HttpServlet {
 							cartLine = new ShoppingCartLine();
 							cartLine.setProduct(g);
 							cartLine.setQuantity(quantity);
-							cartLine.setGame(false);
+							cartLine.setGame(true);
 							cartLines.add(cartLine);
 							if(total!=null) {
-								total = total+g.getPrecio()*quantity;
+								total = total-cart.getShippingCosts()+g.getPrecio()*quantity;
 							} else {
 								total = g.getPrecio()*quantity;
 							}
-							if(shippingCost==null) {
-								shippingCost = quantity*0.5;
-							}
-							else {
-								shippingCost = shippingCost+0.5;
+							if(g.getFormato().equals(0)){
+								shippingCost = 0.5;
+							} else {
+								shippingCost = 0.0;
 							}
 						}
 					}
 					if(!errors.hasErrors()) {
 						cart.setLine(cartLines);
-						cart.setShippingCosts(shippingCost);
+						if(cart.getShippingCosts()!=null) {
+							cart.setShippingCosts(shippingCost+cart.getShippingCosts());
+						} else {
+							cart.setShippingCosts(shippingCost);
+						}
 						logger.debug(shippingCost + " " +total);
-						total =  total+0.5;
+						total =  total+shippingCost;
 						cart.setTotal(total);
 						SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
 					}
@@ -638,14 +632,18 @@ public class ProductoServlet extends HttpServlet {
 							g = (Juego) cartLines.get(index).getProduct();
 							quantity = cartLines.get(index).getQuantity();
 							total = total-g.getPrecio()*quantity;
-							shippingCost = shippingCost-quantity*0.5;
+							if(g.getFormato().equals(0)) {
+								shippingCost = cart.getShippingCosts()-quantity*0.5;
+							} else {
+								shippingCost = cart.getShippingCosts();
+							}
 							cartLines.remove(scl);
 						}
 					}
 					
 					if(!errors.hasErrors()) {
 						cart.setTotal(total);
-						cart.setShippingCosts(cartLines.size()*0.5);
+						cart.setShippingCosts(shippingCost);
 						cart.setLine(cartLines);
 						SessionManager.set(request, AttributeNames.SHOPPING_CART, cart);
 					}

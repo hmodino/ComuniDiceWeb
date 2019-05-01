@@ -46,7 +46,8 @@ public class SearchServlet extends HttpServlet {
 			} else {
 				target = url;
 			}
-		} else if(action==null) {
+		} else if(!Actions.SEARCH_USERS.equalsIgnoreCase(action)
+				&& !Actions.SEARCH_USERS.equalsIgnoreCase(action)) {
 			defaultSearch = ParameterNames.RATING.concat("=").concat("2");
 			target = ControllerPaths.NO_CONTEXT_PRODUCTO.concat("?").concat(ParameterNames.ACTION).concat("=").concat(Actions.SEARCH_PRODUCTS)
 					.concat("&").concat(ParameterNames.DEFAULT).concat("=").concat("true").concat(defaultSearch);

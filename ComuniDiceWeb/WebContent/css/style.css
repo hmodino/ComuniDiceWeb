@@ -84,6 +84,10 @@ textarea{
 	display: inline;
 }
 
+#hiddenCriteria{
+	text-align:left;
+}
+
 #hiddenCriteria, #hiddenUsuario{
 	visibility:hidden;
 }
@@ -106,6 +110,7 @@ textarea{
 
 .content p{
 	color: #906014;
+	margin-right:12px;
 }
 
 .resultado{
@@ -162,7 +167,17 @@ textarea{
 }
 
 #enviarComentario{
-	align:center;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+#descripcion, #precio, #fechaEntrada, #valoracion, #anhoPublicacion, #formato, #paginas, #tipoTapa, #comentarios{
+	color:#000000;
+	font-size:1.1em;
+}
+
+#formComentario{
+	text-align:center;
 }
 
 footer{

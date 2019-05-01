@@ -13,14 +13,37 @@
 	</c:url>
 	<div id="vistaDetalleProducto" class="content">
 		<p>${result.nombre}</p>
+		<p id="descripcion"><fmt:message key="descripcion" bundle="${messages}"/></p>
 		<p>${result.descripcion}</p>
+		<p id="precio"><fmt:message key="precio" bundle="${messages}"/></p>
 		<p>${result.precio}</p>
+		<p id="fechaEntrada"><fmt:message key="fechaEntrada" bundle="${messages}"/></p>
 		<p>${result.fechaEntrada}</p>
-		<p>${result.stock}</p>
+		<p id="valoracion"><fmt:message key="valoracion" bundle="${messages}"/></p>
 		<p>${result.valoracion}</p>
+		<c:if test="${game}">
+			<p id="anhoPublicacion"><fmt:message key="anhoPublicacion" bundle="${messages}"/></p>
+			<p>${result.anhoPublicacion}</p>
+			<p id="formato"><fmt:message key="formato" bundle="${messages}"/></p>
+			<c:if test="${result.formato eq 0}">
+				<p><fmt:message key="fisico" bundle="${messages}"/></p>
+			</c:if>
+			<c:if test="${result.formato eq 1}">
+				<p>PDF</p>
+			</c:if>
+			<p id="paginas"><fmt:message key="paginas" bundle="${messages}"/></p>
+			<p>${result.paginas}</p>
+			<p id="tipoTapa"><fmt:message key="tipoTapa" bundle="${messages}"/></p>
+			<c:if test="${result.tipoTapa eq 0}">
+				<p><fmt:message key="tapaBlanda" bundle="${messages}"/></p>
+			</c:if>
+			<c:if test="${result.tipoTapa eq 1}">
+				<p><fmt:message key="tapaDura" bundle="${messages}"/></p>
+			</c:if>
+		</c:if>
 		<a href="${fav}"><fmt:message key="favorito" bundle="${messages}"/></a>
 		<a href="${cart}"><fmt:message key="anadirCarrito" bundle="${messages}"/></a>
-		<fmt:message key="valoracion" bundle="${messages}"/>
+		<p id="valoracion"><fmt:message key="valora" bundle="${messages}"/></p>
 		<form action="<%=ControllerPaths.PRODUCTO %>" method="post">
 			<input type="hidden" name="<%=ParameterNames.ACTION%>" value="<%=Actions.FAVOURITE%>"/>
 			<input type="hidden" name="<%=ParameterNames.ID%>" value="${result.idProducto}"/>
@@ -39,6 +62,7 @@
 			</select>
 		</form>
 		<c:if test="${not empty result.comentarios}">
+			<p id="comentarios"><fmt:message key="comentarios" bundle="${messages}"/></p>
 			<c:forEach items="${result.comentarios}" var="c">
 				<div class="resultadoSinFondo">
 					<p>${c.nombreUsuario}</p>
@@ -54,7 +78,8 @@
 				</div>
 			</c:forEach>
 		</c:if>
-		<form action="<%=ControllerPaths.PRODUCTO %>" method="post">
+		<form id="formComentario" action="<%=ControllerPaths.PRODUCTO %>" method="post">
+			<fmt:message key="comenta" bundle="${messages}"/>
 			<input type="hidden" name="<%=ParameterNames.ACTION %>" value="<%=Actions.CREATE_COMMENT %>"/>
 			<input type="hidden" name="<%=ParameterNames.ID%>" value="${result.idProducto}"/>
 			<textarea rows="10" cols="75" name="<%=ParameterNames.CONTENT%>"></textarea>

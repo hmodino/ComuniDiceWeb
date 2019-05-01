@@ -11,6 +11,7 @@ public interface AttributeNames {
 	public static final String FIRST_PAGED_PAGE = "firstPagedPage";
 	public static final String LAST_PAGED_PAGE = "lastPagedPage";
 	public static final String URL = "url";
+	public static final String URLDETAILVIEW = "urlDetailView";
 	public static final String PRODUCTS = "products";
 	public static final String SHOPPING_CART = "shoppingCart";
 	public static final String LANGUAGE = "language";
