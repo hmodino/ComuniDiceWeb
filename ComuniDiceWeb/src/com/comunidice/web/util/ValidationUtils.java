@@ -158,4 +158,34 @@ public class ValidationUtils {
 		return b;
 		
 	}
+	
+	public static String validateEmail(HttpServletRequest request, String name) {
+
+		String s = parameterIsEmpty(request, name);
+		if(s!=null) {
+			String[] array = s.split("@");
+			if(array.length>1) {
+				String s1 = array[1];
+				array = s1.split(".com");
+				if(array.length!=0) {
+						return s;
+				} else {
+					array = s1.split(".es");
+					if(array.length!=0) {
+						return s;
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	public static String isNumber(HttpServletRequest request, String name) {
+		
+		Integer i = parseIntParameter(request, name);
+		if(i!=null) {
+			return i.toString();
+		}
+		return null;
+	}
 }

@@ -23,7 +23,7 @@
 					<select name="<%=ParameterNames.CATEGORY_ID%>">
 						<option></option>
 						<c:forEach items="${categories}" var="c">
-							<option value="${c.id}"><p>${c.nombre}</p></option>
+							<option value="${c.id}"><p><fmt:message key="${c.nombre}" bundle="${messages}"/></p></option>
 						</c:forEach>
 					</select>
 				</c:if>
@@ -36,9 +36,9 @@
 					<option></option>
 					<option value="0"><p>ComuniDice</p></option>
 					<option value="1"><p><fmt:message key="particular" bundle="${messages}"/></p></option>
-				</select>
+				</select><br>
 				<p><fmt:message key="publicacionMin" bundle="${messages}"/></p>
-					<input type="number" min="1990" max="2019" name="<%=ParameterNames.MIN_PUBLICATION_YEAR %>"><br>
+					<input type="number" min="1990" max="2019" name="<%=ParameterNames.MIN_PUBLICATION_YEAR %>">
 				<p><fmt:message key="publicacionMax" bundle="${messages}"/></p>
 					<input type="number" min="1990" max="2019" name="<%=ParameterNames.MAX_PUBLICATION_YEAR %>">
 				<p><fmt:message key="formato" bundle="${messages}"/></p>

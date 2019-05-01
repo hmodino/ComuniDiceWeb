@@ -248,12 +248,12 @@ public class UsuarioServlet extends HttpServlet {
 
 			name = ValidationUtils.parameterIsEmpty(request, ParameterNames.NAME);
 			password = ValidationUtils.parameterIsEmpty(request, ParameterNames.PASSWORD);
-			email = ValidationUtils.parameterIsEmpty(request, ParameterNames.EMAIL);
+			email = ValidationUtils.validateEmail(request, ParameterNames.EMAIL);
 			userName = ValidationUtils.parameterIsEmpty(request, ParameterNames.USER_NAME);
 			surname1 = ValidationUtils.parameterIsEmpty(request, ParameterNames.SURNAME);
 			surname2 = ValidationUtils.parameterIsEmpty(request, ParameterNames.SURNAME2);
 			description = ValidationUtils.parameterIsEmpty(request, ParameterNames.DESCRIPTION);
-			phone = ValidationUtils.parameterIsEmpty(request, ParameterNames.PHONE);
+			phone = ValidationUtils.isNumber(request, ParameterNames.PHONE);
 			municipality = ValidationUtils.parameterIsEmpty(request, ParameterNames.MUNICIPALITY);
 			locality = ValidationUtils.parameterIsEmpty(request, ParameterNames.LOCALITY);
 			cp = ValidationUtils.parameterIsEmpty(request, ParameterNames.CP);
@@ -359,12 +359,12 @@ public class UsuarioServlet extends HttpServlet {
 
 			name = ValidationUtils.parameterIsEmpty(request, ParameterNames.NAME);
 			password = ValidationUtils.parameterIsEmpty(request, ParameterNames.PASSWORD);
-			email = ValidationUtils.parameterIsEmpty(request, ParameterNames.EMAIL);
+			email = ValidationUtils.validateEmail(request, ParameterNames.EMAIL);
 			userName = ValidationUtils.parameterIsEmpty(request, ParameterNames.USER_NAME);
 			surname1 = ValidationUtils.parameterIsEmpty(request, ParameterNames.SURNAME);
 			surname2 = ValidationUtils.parameterIsEmpty(request, ParameterNames.SURNAME2);
 			description = ValidationUtils.parameterIsEmpty(request, ParameterNames.DESCRIPTION);
-			phone = ValidationUtils.parameterIsEmpty(request, ParameterNames.PHONE);
+			phone = ValidationUtils.isNumber(request, ParameterNames.PHONE);
 			municipality = ValidationUtils.parameterIsEmpty(request, ParameterNames.MUNICIPALITY);
 			locality = ValidationUtils.parameterIsEmpty(request, ParameterNames.LOCALITY);
 			cp = ValidationUtils.parameterIsEmpty(request, ParameterNames.CP);
