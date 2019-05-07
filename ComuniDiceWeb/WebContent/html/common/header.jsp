@@ -11,7 +11,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+	<title>ComuniDice</title>
+	<link rel="icon" href="/ComuniDiceWeb/imgs/icono.ico">
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<link href="https://fonts.googleapis.com/css?family=Cinzel" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" media="screen" href="/ComuniDiceWeb/css/style.css" />
 	<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery-3.3.1.min.js"></script> 
 	<script type="text/javascript" src="<%=request.getContextPath()%>/js/menu.js"></script> 

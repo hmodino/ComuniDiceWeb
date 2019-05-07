@@ -8,8 +8,6 @@
 				placeholder="<fmt:message key="ejemploEmail" bundle="${messages}"/>"/>
 			<input type="password" name="<%=ParameterNames.PASSWORD%>" 
 				placeholder="<fmt:message key="contrasena" bundle="${messages}"/>"/>
-			<input type="checkbox" name="<%=ParameterNames.REMEMBERME %>" value="<%=ParameterNames.TRUE%>" ${check}>
-				<fmt:message key="recuerdame" bundle="${messages}"/>
 			<input type="submit" value="<fmt:message key="enviar" bundle="${messages}"/>"/>
 		</form>
 </div>

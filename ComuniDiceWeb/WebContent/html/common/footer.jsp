@@ -1,7 +1,7 @@
 
 		<footer>		
 			<div id="footer">
-				<center><a href="/ComuniDiceWebTraining/html/common/pendiente.html">Aviso legal</a></center>
+				<center><a href="#"><fmt:message key="aviso" bundle="${messages}"/></a></center>
 			</div>
 		</footer>
 	</body>

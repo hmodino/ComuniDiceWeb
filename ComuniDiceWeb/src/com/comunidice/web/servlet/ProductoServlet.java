@@ -182,7 +182,7 @@ public class ProductoServlet extends HttpServlet {
 				c.setIdCategoria(categoryId);
 			}
 			if(name!=null) {
-				c.setNombre(name);
+				c.setNombre(name.toUpperCase());
 			}
 			if(minPrice!=null) {
 				c.setPrecioDesde(minPrice);
@@ -227,7 +227,7 @@ public class ProductoServlet extends HttpServlet {
 				gs = new ArrayList<Juego>();
 				games = new Results<Juego>(gs, startIndex, count);
 				try {
-					games = service.findJuegoByCriteria(c, startIndex, count);
+					games = service.findJuegoByCriteria(c, startIndex, count, language);
 					gs = games.getPage();
 					total = Math.ceil((double)games.getTotal());
 					totalPages = (int) Math.ceil((double)games.getTotal()/(double)count);
@@ -716,12 +716,16 @@ public class ProductoServlet extends HttpServlet {
 			if(u!=null) {
 				cardNumber = ValidationUtils.parameterIsEmpty(request, ParameterNames.CARD_NUMBER);
 				expireDate = ValidationUtils.dateFormat(ValidationUtils.getParameter(request, ParameterNames.EXPIRE_DATE));
-	
-				if(PagoServiceMock.check(cardNumber, expireDate)) {
-					urlMap = new HashMap<String, String>();
-					urlMap.put(ParameterNames.ACTION, Actions.BUY);
-					target = ParameterUtils.URLBuilder(ControllerPaths.NO_CONTEXT_PRODUCTO, urlMap);
-					redirect = true;
+				
+				if(cardNumber!=null && expireDate!=null) {
+					if(PagoServiceMock.check(cardNumber, expireDate)) {
+						urlMap = new HashMap<String, String>();
+						urlMap.put(ParameterNames.ACTION, Actions.BUY);
+						target = ParameterUtils.URLBuilder(ControllerPaths.NO_CONTEXT_PRODUCTO, urlMap);
+						redirect = true;
+					} else {
+						target = ViewPaths.CART;
+					}
 				} else {
 					target = ViewPaths.CART;
 				}

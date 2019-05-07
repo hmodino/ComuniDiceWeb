@@ -15,6 +15,7 @@
 						<c:param name="<%=ParameterNames.ACTION %>" value="<%=Actions.PRE_SEND_MESSAGE%>"/>
 						<c:param name="<%=ParameterNames.ID %>" value="${r.usuarioEmisor}"/>
 					</c:url>
+					<p>${r.nombre}</p>
 					<p>${r.contenido}</p>
 					<a href="${eliminar}"><fmt:message key="eliminar" bundle="${messages}"/></a>
 					<c:if test="${r.usuarioEmisor ne sessionScope['user'].idUsuario}">

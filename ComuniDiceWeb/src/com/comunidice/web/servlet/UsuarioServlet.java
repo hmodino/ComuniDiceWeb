@@ -2,8 +2,10 @@ package com.comunidice.web.servlet;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,10 +20,12 @@ import com.comunidice.web.model.Errors;
 import com.comunidice.web.model.ShoppingCart;
 import com.comunidice.web.util.Actions;
 import com.comunidice.web.util.AttributeNames;
+import com.comunidice.web.util.ControllerPaths;
 import com.comunidice.web.util.CookieManager;
 import com.comunidice.web.util.ErrorCodes;
 import com.comunidice.web.util.LocaleManager;
 import com.comunidice.web.util.ParameterNames;
+import com.comunidice.web.util.ParameterUtils;
 import com.comunidice.web.util.RedirectOrForward;
 import com.comunidice.web.util.SessionAttributeNames;
 import com.comunidice.web.util.SessionManager;
@@ -87,6 +91,8 @@ public class UsuarioServlet extends HttpServlet {
 		List<Favorito> favorito = null;
 		List<Region> regions = null;
 		List<Pais> countries = null;
+		
+		Map<String, String> urlMap = null;
 		
 		String action = ValidationUtils.parameterIsEmpty(request, ParameterNames.ACTION);
 
@@ -262,6 +268,9 @@ public class UsuarioServlet extends HttpServlet {
 			portal = ValidationUtils.parameterIsEmpty(request, ParameterNames.PORTAL);
 			floor = ValidationUtils.parseIntParameter(request, ParameterNames.FLOOR);
 			other = ValidationUtils.parameterIsEmpty(request, ParameterNames.DIRECTION_OTHERS);
+			
+			urlMap = new HashMap<String,String>();
+			urlMap.put(ParameterNames.ACTION, Actions.PRE_SIGN_UP);
 
 			if(name != null) {
 				u.setNombre(name);
@@ -335,8 +344,8 @@ public class UsuarioServlet extends HttpServlet {
 				if (logger.isDebugEnabled()) {
 					logger.debug("El usuario que buscas no existe: {}", errors);
 				}				
-				target = ViewPaths.SIGNUP;
-				redirect = false;
+				target = ParameterUtils.URLBuilder(ControllerPaths.NO_CONTEXT_USUARIO, urlMap);
+				redirect = true;
 				SetAttribute.setErrors(request, errors);
 			}else {
 				try {
@@ -346,7 +355,7 @@ public class UsuarioServlet extends HttpServlet {
 					redirect = true;
 				} catch (Exception e) {
 					errors.add(ParameterNames.USER, ErrorCodes.SIGN_UP_ERROR);
-					target = ViewPaths.SIGNUP;
+					target = ParameterUtils.URLBuilder(ControllerPaths.NO_CONTEXT_USUARIO, urlMap);
 					redirect = false;
 					SetAttribute.setErrors(request, errors);
 				}
